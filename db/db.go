@@ -9,7 +9,7 @@ import (
 
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/nikitamirzani323/BTANGKAS_SUPER_API/helpers"
+	"github.com/nikitamirzani323/WIGO_MASTER_API/helpers"
 )
 
 var db *sql.DB

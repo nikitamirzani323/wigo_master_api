@@ -11,10 +11,10 @@ import (
 
 	"github.com/buger/jsonparser"
 	"github.com/gofiber/fiber/v2"
-	"github.com/nikitamirzani323/BTANGKAS_SUPER_API/configs"
-	"github.com/nikitamirzani323/BTANGKAS_SUPER_API/db"
-	"github.com/nikitamirzani323/BTANGKAS_SUPER_API/entities"
-	"github.com/nikitamirzani323/BTANGKAS_SUPER_API/helpers"
+	"github.com/nikitamirzani323/WIGO_MASTER_API/configs"
+	"github.com/nikitamirzani323/WIGO_MASTER_API/db"
+	"github.com/nikitamirzani323/WIGO_MASTER_API/entities"
+	"github.com/nikitamirzani323/WIGO_MASTER_API/helpers"
 	"github.com/nleeper/goment"
 )
 

@@ -9,9 +9,9 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/nikitamirzani323/BTANGKAS_SUPER_API/entities"
-	"github.com/nikitamirzani323/BTANGKAS_SUPER_API/helpers"
-	"github.com/nikitamirzani323/BTANGKAS_SUPER_API/models"
+	"github.com/nikitamirzani323/WIGO_MASTER_API/entities"
+	"github.com/nikitamirzani323/WIGO_MASTER_API/helpers"
+	"github.com/nikitamirzani323/WIGO_MASTER_API/models"
 )
 
 const Fieldwarehouse_home_redis = "LISTWAREHOUSE_BACKEND"

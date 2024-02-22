@@ -6,8 +6,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/nikitamirzani323/BTANGKAS_SUPER_API/controllers"
-	"github.com/nikitamirzani323/BTANGKAS_SUPER_API/middleware"
+	"github.com/nikitamirzani323/WIGO_MASTER_API/controllers"
+	"github.com/nikitamirzani323/WIGO_MASTER_API/middleware"
 )
 
 func Init() *fiber.App {

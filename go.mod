@@ -1,4 +1,4 @@
-module github.com/nikitamirzani323/BTANGKAS_SUPER_API
+module github.com/nikitamirzani323/WIGO_MASTER_API
 
 go 1.17
 

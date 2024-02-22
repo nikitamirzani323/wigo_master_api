@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nikitamirzani323/BTANGKAS_SUPER_API/configs"
-	"github.com/nikitamirzani323/BTANGKAS_SUPER_API/db"
-	"github.com/nikitamirzani323/BTANGKAS_SUPER_API/helpers"
+	"github.com/nikitamirzani323/WIGO_MASTER_API/configs"
+	"github.com/nikitamirzani323/WIGO_MASTER_API/db"
+	"github.com/nikitamirzani323/WIGO_MASTER_API/helpers"
 )
 
 func Get_counter(field_column string) int {
