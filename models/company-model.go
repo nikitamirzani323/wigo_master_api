@@ -18,10 +18,12 @@ import (
 
 const database_company_local = configs.DB_tbl_mst_company
 
-func Fetch_companyHome(search string, page int) (helpers.Responsepaging, error) {
+func Fetch_companyHome(search string, page int) (helpers.Responsercompany, error) {
 	var obj entities.Model_company
 	var arraobj []entities.Model_company
-	var res helpers.Responsepaging
+	var objcurr entities.Model_currshare
+	var arraobjcurr []entities.Model_currshare
+	var res helpers.Responsercompany
 	msg := "Data Not Found"
 	con := db.CreateCon()
 	ctx := context.Background()
@@ -56,7 +58,7 @@ func Fetch_companyHome(search string, page int) (helpers.Responsepaging, error) 
 	sql_select += "statuscompany, "
 	sql_select += "createcompany, to_char(COALESCE(createdatecompany,now()), 'YYYY-MM-DD HH24:MI:SS'), "
 	sql_select += "updatecompany, to_char(COALESCE(updatedatecompany,now()), 'YYYY-MM-DD HH24:MI:SS')  "
-	sql_select += "FROM " + database_departement_local + "   "
+	sql_select += "FROM " + database_company_local + "   "
 	if search == "" {
 		sql_select += "ORDER BY createdatecompany DESC  OFFSET " + strconv.Itoa(offset) + " LIMIT " + strconv.Itoa(perpage)
 
@@ -118,11 +120,34 @@ func Fetch_companyHome(search string, page int) (helpers.Responsepaging, error) 
 	}
 	defer row.Close()
 
+	sql_selectcurr := `SELECT 
+			idcurr 
+			FROM ` + configs.DB_tbl_mst_curr + ` 
+			ORDER BY idcurr ASC    
+	`
+	rowcurr, errcurr := con.QueryContext(ctx, sql_selectcurr)
+	helpers.ErrorCheck(errcurr)
+	for rowcurr.Next() {
+		var (
+			idcurr_db string
+		)
+
+		errcurr = rowcurr.Scan(&idcurr_db)
+
+		helpers.ErrorCheck(errcurr)
+
+		objcurr.Curr_id = idcurr_db
+		arraobjcurr = append(arraobjcurr, objcurr)
+		msg = "Success"
+	}
+	defer rowcurr.Close()
+
 	res.Status = fiber.StatusOK
 	res.Message = msg
 	res.Record = arraobj
 	res.Perpage = perpage
 	res.Totalrecord = totalrecord
+	res.Listcurr = arraobjcurr
 	res.Time = time.Since(start).String()
 
 	return res, nil

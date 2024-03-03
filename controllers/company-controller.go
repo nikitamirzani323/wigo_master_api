@@ -52,10 +52,13 @@ func Companyhome(c *fiber.Ctx) error {
 
 	var obj entities.Model_company
 	var arraobj []entities.Model_company
+	var objcurr entities.Model_currshare
+	var arraobjcurr []entities.Model_currshare
 	render_page := time.Now()
 	resultredis, flag := helpers.GetRedis(Fieldcompany_home_redis)
 	jsonredis := []byte(resultredis)
 	record_RD, _, _, _ := jsonparser.Get(jsonredis, "record")
+	listcurr_RD, _, _, _ := jsonparser.Get(jsonredis, "listcurr")
 	jsonparser.ArrayEach(record_RD, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		company_id, _ := jsonparser.GetString(value, "company_id")
 		company_startjoin, _ := jsonparser.GetString(value, "company_startjoin")
@@ -92,7 +95,12 @@ func Companyhome(c *fiber.Ctx) error {
 		obj.Company_update = company_update
 		arraobj = append(arraobj, obj)
 	})
+	jsonparser.ArrayEach(listcurr_RD, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		curr_id, _ := jsonparser.GetString(value, "curr_id")
 
+		objcurr.Curr_id = curr_id
+		arraobjcurr = append(arraobjcurr, objcurr)
+	})
 	if !flag {
 		result, err := models.Fetch_companyHome(client.Company_search, client.Company_page)
 		if err != nil {
@@ -104,15 +112,16 @@ func Companyhome(c *fiber.Ctx) error {
 			})
 		}
 		helpers.SetRedis(Fieldcompany_home_redis+"_"+strconv.Itoa(client.Company_page)+"_"+client.Company_search, result, 60*time.Minute)
-		fmt.Println("COMPANY MYSQL")
+		fmt.Println("COMPANY DATABASE")
 		return c.JSON(result)
 	} else {
 		fmt.Println("COMPANY CACHE")
 		return c.JSON(fiber.Map{
-			"status":  fiber.StatusOK,
-			"message": "Success",
-			"record":  arraobj,
-			"time":    time.Since(render_page).String(),
+			"status":   fiber.StatusOK,
+			"message":  "Success",
+			"record":   arraobj,
+			"listcurr": arraobjcurr,
+			"time":     time.Since(render_page).String(),
 		})
 	}
 }
