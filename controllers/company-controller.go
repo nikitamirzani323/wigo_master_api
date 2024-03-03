@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/buger/jsonparser"
@@ -16,6 +17,39 @@ import (
 const Fieldcompany_home_redis = "LISTCOMPANY_BACKEND"
 
 func Companyhome(c *fiber.Ctx) error {
+	var errors []*helpers.ErrorResponse
+	client := new(entities.Controller_company)
+	validate := validator.New()
+	if err := c.BodyParser(client); err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+			"record":  nil,
+		})
+	}
+
+	err := validate.Struct(client)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			var element helpers.ErrorResponse
+			element.Field = err.StructField()
+			element.Tag = err.Tag()
+			errors = append(errors, &element)
+		}
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": "validation",
+			"record":  errors,
+		})
+	}
+	fmt.Println(client.Company_page)
+	if client.Company_search != "" {
+		val_pattern := helpers.DeleteRedis(Fieldcompany_home_redis + "_" + strconv.Itoa(client.Company_page) + "_" + client.Company_search)
+		fmt.Printf("Redis Delete BACKEND COMPANY : %d", val_pattern)
+	}
+
 	var obj entities.Model_company
 	var arraobj []entities.Model_company
 	render_page := time.Now()
@@ -60,7 +94,7 @@ func Companyhome(c *fiber.Ctx) error {
 	})
 
 	if !flag {
-		result, err := models.Fetch_companyHome()
+		result, err := models.Fetch_companyHome(client.Company_search, client.Company_page)
 		if err != nil {
 			c.Status(fiber.StatusBadRequest)
 			return c.JSON(fiber.Map{
@@ -69,7 +103,7 @@ func Companyhome(c *fiber.Ctx) error {
 				"record":  nil,
 			})
 		}
-		helpers.SetRedis(Fieldcompany_home_redis, result, 60*time.Minute)
+		helpers.SetRedis(Fieldcompany_home_redis+"_"+strconv.Itoa(client.Company_page)+"_"+client.Company_search, result, 60*time.Minute)
 		fmt.Println("COMPANY MYSQL")
 		return c.JSON(result)
 	} else {

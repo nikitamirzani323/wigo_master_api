@@ -2,7 +2,10 @@ package models
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -15,25 +18,53 @@ import (
 
 const database_company_local = configs.DB_tbl_mst_company
 
-func Fetch_companyHome() (helpers.Response, error) {
+func Fetch_companyHome(search string, page int) (helpers.Responsepaging, error) {
 	var obj entities.Model_company
 	var arraobj []entities.Model_company
-	var res helpers.Response
+	var res helpers.Responsepaging
 	msg := "Data Not Found"
 	con := db.CreateCon()
 	ctx := context.Background()
 	start := time.Now()
 
-	sql_select := `SELECT 
-			idcompany ,
-			startjoincompany, endjoincompany, idcurr, 
-			nmcompany, nmowner, emailowner, phone1owner,phone2owner,
-			companyurl_1, companyurl_2, minfee,
-			statuscompany, 
-			createcompany, to_char(COALESCE(createdatecompany,now()), 'YYYY-MM-DD HH24:MI:SS'), 
-			updatecompany, to_char(COALESCE(updatedatecompany,now()), 'YYYY-MM-DD HH24:MI:SS') 
-			FROM ` + database_company_local + `  
-			ORDER BY createdatecompany DESC   `
+	perpage := configs.PAGING_PAGE
+	totalrecord := 0
+	offset := page
+	sql_selectcount := ""
+	sql_selectcount += ""
+	sql_selectcount += "SELECT "
+	sql_selectcount += "COUNT(idcompany) as totalcompany  "
+	sql_selectcount += "FROM " + database_company_local + "  "
+	if search != "" {
+		sql_selectcount += "WHERE LOWER(idcompany) LIKE '%" + strings.ToLower(search) + "%' "
+		sql_selectcount += "OR LOWER(nmcompany) LIKE '%" + strings.ToLower(search) + "%' "
+	}
+	row_selectcount := con.QueryRowContext(ctx, sql_selectcount)
+	switch e_selectcount := row_selectcount.Scan(&totalrecord); e_selectcount {
+	case sql.ErrNoRows:
+	case nil:
+	default:
+		helpers.ErrorCheck(e_selectcount)
+	}
+
+	sql_select := ""
+	sql_select += "SELECT "
+	sql_select += "idcompany, "
+	sql_select += "startjoincompany, endjoincompany, idcurr, "
+	sql_select += "nmcompany, nmowner, emailowner, phone1owner,phone2owner, "
+	sql_select += "companyurl_1, companyurl_2, minfee, "
+	sql_select += "statuscompany, "
+	sql_select += "createcompany, to_char(COALESCE(createdatecompany,now()), 'YYYY-MM-DD HH24:MI:SS'), "
+	sql_select += "updatecompany, to_char(COALESCE(updatedatecompany,now()), 'YYYY-MM-DD HH24:MI:SS')  "
+	sql_select += "FROM " + database_departement_local + "   "
+	if search == "" {
+		sql_select += "ORDER BY createdatecompany DESC  OFFSET " + strconv.Itoa(offset) + " LIMIT " + strconv.Itoa(perpage)
+
+	} else {
+		sql_select += "WHERE LOWER(idcompany) LIKE '%" + strings.ToLower(search) + "%' "
+		sql_select += "OR LOWER(nmcompany) LIKE '%" + strings.ToLower(search) + "%' "
+		sql_select += "ORDER BY createdatecompany DESC   LIMIT " + strconv.Itoa(perpage)
+	}
 
 	row, err := con.QueryContext(ctx, sql_select)
 	helpers.ErrorCheck(err)
@@ -90,6 +121,8 @@ func Fetch_companyHome() (helpers.Response, error) {
 	res.Status = fiber.StatusOK
 	res.Message = msg
 	res.Record = arraobj
+	res.Perpage = perpage
+	res.Totalrecord = totalrecord
 	res.Time = time.Since(start).String()
 
 	return res, nil
