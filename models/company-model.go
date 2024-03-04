@@ -52,7 +52,8 @@ func Fetch_companyHome(search string, page int) (helpers.Responsercompany, error
 	sql_select := ""
 	sql_select += "SELECT "
 	sql_select += "idcompany, "
-	sql_select += "startjoincompany, endjoincompany, idcurr, "
+	sql_select += "to_char(COALESCE(startjoincompany,now()), 'YYYY-MM-DD HH24:MI:SS'), "
+	sql_select += "to_char(COALESCE(endjoincompany,now()), 'YYYY-MM-DD HH24:MI:SS'), idcurr, "
 	sql_select += "nmcompany, nmowner, emailowner, phone1owner,phone2owner, "
 	sql_select += "companyurl_1, companyurl_2, minfee, "
 	sql_select += "statuscompany, "
@@ -82,7 +83,7 @@ func Fetch_companyHome(search string, page int) (helpers.Responsercompany, error
 		err = row.Scan(&idcompany_db,
 			&startjoincompany_db, &endjoincompany_db, &idcurr_db,
 			&nmcompany_db, &nmowner_db, &emailowner_db, &phone1owner_db, &phone2owner_db,
-			&companyurl_1_db, &companyurl_2_db, &statuscompany_db, &minfee_db,
+			&companyurl_1_db, &companyurl_2_db, &minfee_db, &statuscompany_db,
 			&createcompany_db, &createdatecompany_db, &updatecompany_db, &updatedatecompany_db)
 
 		helpers.ErrorCheck(err)
@@ -180,9 +181,9 @@ func Save_company(admin, idrecord, idcurr, nmcompany, nmowner,
 			start_join := tglnow.Format("YYYY-MM-DD HH:mm:ss")
 			flag_insert, msg_insert := Exec_SQL(sql_insert, database_company_local, "INSERT",
 				idrecord, start_join, start_join, idcurr,
-				idrecord, nmowner, emailowner, phone1, phone2, url1, url2,
-				minfee, status,
-				nmcompany, start_join)
+				nmcompany, nmowner, emailowner, phone1, phone2,
+				url1, url2, minfee, status,
+				admin, start_join)
 
 			if flag_insert {
 				msg = "Succes"
