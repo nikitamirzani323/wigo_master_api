@@ -17,6 +17,7 @@ import (
 )
 
 const database_company_local = configs.DB_tbl_mst_company
+const database_companyadmin_local = configs.DB_tbl_mst_company_admin
 
 func Fetch_companyHome(search string, page int) (helpers.Responsercompany, error) {
 	var obj entities.Model_company
@@ -153,6 +154,71 @@ func Fetch_companyHome(search string, page int) (helpers.Responsercompany, error
 
 	return res, nil
 }
+func Fetch_companyadminHome(idcompany string) (helpers.Response, error) {
+	var obj entities.Model_companyadmin
+	var arraobj []entities.Model_companyadmin
+	var res helpers.Response
+	msg := "Data Not Found"
+	con := db.CreateCon()
+	ctx := context.Background()
+	start := time.Now()
+
+	sql_select := ""
+	sql_select += "SELECT "
+	sql_select += "idcompadmin, "
+	sql_select += "username, nameadmin, statuscompadmin, "
+	sql_select += "createcompadmin, to_char(COALESCE(createdatecompadmin,now()), 'YYYY-MM-DD HH24:MI:SS'), "
+	sql_select += "updatecompadmin, to_char(COALESCE(updatedatecompadmin,now()), 'YYYY-MM-DD HH24:MI:SS')  "
+	sql_select += "FROM " + database_companyadmin_local + " "
+	sql_select += "WHERE LOWER(idcompany) ='" + idcompany + "' "
+	sql_select += "ORDER BY createdatecompadmin DESC   "
+
+	row, err := con.QueryContext(ctx, sql_select)
+	helpers.ErrorCheck(err)
+	for row.Next() {
+		var (
+			idcompadmin_db                                                                         int
+			username_db, nameadmin_db, statuscompadmin_db                                          string
+			createcompadmin_db, createdatecompadmin_db, updatecompadmin_db, updatedatecompadmin_db string
+		)
+
+		err = row.Scan(&idcompadmin_db,
+			&username_db, &nameadmin_db, &statuscompadmin_db,
+			&createcompadmin_db, &createdatecompadmin_db, &updatecompadmin_db, &updatedatecompadmin_db)
+
+		helpers.ErrorCheck(err)
+		create := ""
+		update := ""
+		status_css := configs.STATUS_CANCEL
+		if createcompadmin_db != "" {
+			create = createcompadmin_db + ", " + createdatecompadmin_db
+		}
+		if updatecompadmin_db != "" {
+			update = updatecompadmin_db + ", " + updatedatecompadmin_db
+		}
+		if statuscompadmin_db == "Y" {
+			status_css = configs.STATUS_COMPLETE
+		}
+
+		obj.Companyadmin_id = idcompadmin_db
+		obj.Companyadmin_username = username_db
+		obj.Companyadmin_name = nameadmin_db
+		obj.Companyadmin_status = statuscompadmin_db
+		obj.Companyadmin_status_css = status_css
+		obj.Companyadmin_create = create
+		obj.Companyadmin_update = update
+		arraobj = append(arraobj, obj)
+		msg = "Success"
+	}
+	defer row.Close()
+
+	res.Status = fiber.StatusOK
+	res.Message = msg
+	res.Record = arraobj
+	res.Time = time.Since(start).String()
+
+	return res, nil
+}
 func Save_company(admin, idrecord, idcurr, nmcompany, nmowner,
 	emailowner, phone1, phone2, url1, url2, status, sData string, minfee float64) (helpers.Response, error) {
 	var res helpers.Response
@@ -207,6 +273,72 @@ func Save_company(admin, idrecord, idcurr, nmcompany, nmowner,
 		flag_update, msg_update := Exec_SQL(sql_update, database_company_local, "UPDATE",
 			idcurr, nmcompany, nmowner,
 			emailowner, phone1, phone2, url1, url2, minfee, status,
+			admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"), idrecord)
+
+		if flag_update {
+			flag = true
+			msg = "Succes"
+		} else {
+			fmt.Println(msg_update)
+		}
+	}
+
+	res.Status = fiber.StatusOK
+	res.Message = msg
+	res.Record = nil
+	res.Time = time.Since(render_page).String()
+
+	return res, nil
+}
+func Save_companyadmin(admin, idcompany, username, password, name, status, sData string, idrecord int) (helpers.Response, error) {
+	var res helpers.Response
+	msg := "Failed"
+	tglnow, _ := goment.New()
+	render_page := time.Now()
+	flag := false
+
+	if sData == "New" {
+		flag = CheckDB(database_company_local, "username", username)
+		if !flag {
+			sql_insert := `
+				insert into
+				` + database_companyadmin_local + ` (
+					idcompadmin, idcompany,  username, password, nameadmin, statuscompadmin, 
+					createcompadmin, createdatecompadmin 
+				) values (
+					$1, $2, $3, $4, $5, $6, 
+					$7, $8, 
+				)
+			`
+
+			hashpass := helpers.HashPasswordMD5(password)
+			field_column := database_companyadmin_local + strings.ToLower(idcompany) + tglnow.Format("YYYY")
+			idrecord_counter := Get_counter(field_column)
+			idrecord := tglnow.Format("YY") + strconv.Itoa(idrecord_counter)
+			flag_insert, msg_insert := Exec_SQL(sql_insert, database_companyadmin_local, "INSERT",
+				idrecord, idcompany, username, hashpass,
+				name, status,
+				admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
+
+			if flag_insert {
+				msg = "Succes"
+			} else {
+				fmt.Println(msg_insert)
+			}
+		} else {
+			msg = "Duplicate Entry"
+		}
+	} else {
+		sql_update := `
+				UPDATE 
+				` + database_companyadmin_local + `  
+				SET nameadmin=$1, statuscompadmin=$2, 
+				updatecompadmin=$3, updatedatecompadmin=$4    
+				WHERE idcompadmin=$5 
+			`
+
+		flag_update, msg_update := Exec_SQL(sql_update, database_companyadmin_local, "UPDATE",
+			name, status,
 			admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"), idrecord)
 
 		if flag_update {
