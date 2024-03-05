@@ -37,6 +37,18 @@ type Model_companyadminrule struct {
 	Companyadminrule_create      string `json:"companyadminrule_create"`
 	Companyadminrule_update      string `json:"companyadminrule_update"`
 }
+type Model_companyconf struct {
+	Companyconf_id                   string  `json:"companyconf_id"`
+	Companyconf_2digit_30_time       int     `json:"companyconf_2digit_30_time"`
+	Companyconf_2digit_30_digit      int     `json:"companyconf_2digit_30_digit"`
+	Companyconf_2digit_30_minbet     int     `json:"companyconf_2digit_30_minbet"`
+	Companyconf_2digit_30_maxbet     int     `json:"companyconf_2digit_30_maxbet"`
+	Companyconf_2digit_30_win        float64 `json:"companyconf_2digit_30_win"`
+	Companyconf_2digit_30_status     string  `json:"companyconf_2digit_30_status"`
+	Companyconf_2digit_30_status_css string  `json:"companyconf_2digit_30_status_css"`
+	Companyconf_create               string  `json:"companyconf_create"`
+	Companyconf_update               string  `json:"companyconf_update"`
+}
 type Model_companyshare struct {
 	Company_id   string `json:"company_id"`
 	Company_name string `json:"company_name"`
@@ -81,6 +93,17 @@ type Controller_companyadminrulesave struct {
 	Companyadminrule_idcompany   string `json:"companyadminrule_idcompany" validate:"required"`
 	Companyadminrule_nmruleadmin string `json:"companyadminrule_nmruleadmin" validate:"required"`
 	Companyadminrule_ruleadmin   string `json:"companyadminrule_ruleadmin" validate:"required"`
+}
+type Controller_companyconfsave struct {
+	Page                         string  `json:"page" validate:"required"`
+	Sdata                        string  `json:"sdata" validate:"required"`
+	Companyconf_id               string  `json:"companyconf_id" validate:"required"`
+	Companyconf_2digit_30_time   int     `json:"companyconf_2digit_30_time" validate:"required"`
+	Companyconf_2digit_30_digit  int     `json:"companyconf_2digit_30_digit" validate:"required"`
+	Companyconf_2digit_30_minbet int     `json:"companyconf_2digit_30_minbet" validate:"required"`
+	Companyconf_2digit_30_maxbet int     `json:"companyconf_2digit_30_maxbet" validate:"required"`
+	Companyconf_2digit_30_win    float64 `json:"companyconf_2digit_30_win" validate:"required"`
+	Companyconf_2digit_30_status string  `json:"companyconf_2digit_30_status" validate:"required"`
 }
 type Controller_company struct {
 	Company_search string `json:"company_search"`

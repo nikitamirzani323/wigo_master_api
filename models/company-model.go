@@ -19,6 +19,7 @@ import (
 const database_company_local = configs.DB_tbl_mst_company
 const database_companyadmin_local = configs.DB_tbl_mst_company_admin
 const database_companyadminrule_local = configs.DB_tbl_mst_company_adminrule
+const database_companyconfig_local = configs.DB_tbl_mst_company_config
 
 func Fetch_companyHome(search string, page int) (helpers.Responsercompany, error) {
 	var obj entities.Model_company
@@ -308,6 +309,74 @@ func Fetch_companyadminruleHome(idcompany string) (helpers.Response, error) {
 
 	return res, nil
 }
+func Fetch_companyconfHome(idcompany string) (helpers.Response, error) {
+	var obj entities.Model_companyconf
+	var arraobj []entities.Model_companyconf
+	var res helpers.Response
+	msg := "Data Not Found"
+	con := db.CreateCon()
+	ctx := context.Background()
+	start := time.Now()
+
+	sql_select := ""
+	sql_select += "SELECT "
+	sql_select += "conf_2digit_30_time, conf_2digit_30_digit, "
+	sql_select += "conf_2digit_30_minbet, conf_2digit_30_maxbet,conf_2digit_30_win,conf_2digit_30_status,  "
+	sql_select += "createconf, to_char(COALESCE(createdateconf,now()), 'YYYY-MM-DD HH24:MI:SS'), "
+	sql_select += "updateconf, to_char(COALESCE(updatedateconf,now()), 'YYYY-MM-DD HH24:MI:SS')  "
+	sql_select += "FROM " + database_companyconfig_local + " "
+	sql_select += "WHERE idcompany ='" + idcompany + "' "
+	fmt.Println(sql_select)
+	row, err := con.QueryContext(ctx, sql_select)
+	helpers.ErrorCheck(err)
+	for row.Next() {
+		var (
+			conf_2digit_30_time_db, conf_2digit_30_digit_db, conf_2digit_30_minbet_db, conf_2digit_30_maxbet_db int
+			conf_2digit_30_win_db                                                                               float64
+			conf_2digit_30_status_db                                                                            string
+			createconf_db, createdateconf_db, updateconf_db, updatedateconf_db                                  string
+		)
+
+		err = row.Scan(&conf_2digit_30_time_db, &conf_2digit_30_digit_db, &conf_2digit_30_minbet_db,
+			&conf_2digit_30_maxbet_db, &conf_2digit_30_win_db, &conf_2digit_30_status_db,
+			&createconf_db, &createdateconf_db, &updateconf_db, &updatedateconf_db)
+
+		helpers.ErrorCheck(err)
+		create := ""
+		update := ""
+		status_css := configs.STATUS_CANCEL
+		if createconf_db != "" {
+			create = createconf_db + ", " + createdateconf_db
+		}
+		if updateconf_db != "" {
+			update = updateconf_db + ", " + updatedateconf_db
+		}
+		if conf_2digit_30_status_db == "Y" {
+			status_css = configs.STATUS_COMPLETE
+		}
+
+		obj.Companyconf_id = idcompany
+		obj.Companyconf_2digit_30_time = conf_2digit_30_time_db
+		obj.Companyconf_2digit_30_digit = conf_2digit_30_digit_db
+		obj.Companyconf_2digit_30_minbet = conf_2digit_30_minbet_db
+		obj.Companyconf_2digit_30_maxbet = conf_2digit_30_maxbet_db
+		obj.Companyconf_2digit_30_win = conf_2digit_30_win_db
+		obj.Companyconf_2digit_30_status = conf_2digit_30_status_db
+		obj.Companyconf_2digit_30_status_css = status_css
+		obj.Companyconf_create = create
+		obj.Companyconf_update = update
+		arraobj = append(arraobj, obj)
+		msg = "Success"
+	}
+	defer row.Close()
+
+	res.Status = fiber.StatusOK
+	res.Message = msg
+	res.Record = arraobj
+	res.Time = time.Since(start).String()
+
+	return res, nil
+}
 func Save_company(admin, idrecord, idcurr, nmcompany, nmowner,
 	emailowner, phone1, phone2, url1, url2, status, sData string, minfee float64) (helpers.Response, error) {
 	var res helpers.Response
@@ -487,6 +556,73 @@ func Save_companyadminrule(admin, idcompany, name, rule, sData string, idrecord 
 		flag_update, msg_update := Exec_SQL(sql_update, database_companyadminrule_local, "UPDATE",
 			name, rule,
 			admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"), idrecord)
+
+		if flag_update {
+			msg = "Succes"
+		} else {
+			fmt.Println(msg_update)
+		}
+	}
+
+	res.Status = fiber.StatusOK
+	res.Message = msg
+	res.Record = nil
+	res.Time = time.Since(render_page).String()
+
+	return res, nil
+}
+func Save_companyconf(admin, idcompany, status_2D30, sData string,
+	time_2D30, digit_2D30, minbet_2D30, maxbet_2D30 int,
+	win_2D30 float64) (helpers.Response, error) {
+	var res helpers.Response
+	msg := "Failed"
+	tglnow, _ := goment.New()
+	render_page := time.Now()
+	flag := false
+
+	if sData == "New" {
+		flag = CheckDB(database_companyconfig_local, "idcompany", idcompany)
+		if !flag {
+			sql_insert := `
+				insert into
+				` + database_companyconfig_local + ` (
+					idcompany, conf_2digit_30_time,  conf_2digit_30_digit, 
+					conf_2digit_30_minbet, conf_2digit_30_maxbet, conf_2digit_30_win, conf_2digit_30_status 
+					createconf, createdateconf 
+				) values (
+					$1, $2, $3, 
+					$4, $5, $6 ,$7, 
+					$8, $9 
+				)
+			`
+
+			flag_insert, msg_insert := Exec_SQL(sql_insert, database_companyconfig_local, "INSERT",
+				idcompany, time_2D30, digit_2D30,
+				minbet_2D30, maxbet_2D30, win_2D30, status_2D30,
+				admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
+
+			if flag_insert {
+				msg = "Succes"
+			} else {
+				fmt.Println(msg_insert)
+			}
+		} else {
+			msg = "Duplicate Entry"
+		}
+	} else {
+		sql_update := `
+				UPDATE 
+				` + database_companyconfig_local + `  
+				SET conf_2digit_30_time=$1, conf_2digit_30_digit=$2, 
+				conf_2digit_30_minbet=$3, conf_2digit_30_maxbet=$4, conf_2digit_30_win=$5, conf_2digit_30_status=$6,   
+				updateconf=$7, updatedateconf=$8     
+				WHERE idcompany=$9   
+			`
+
+		flag_update, msg_update := Exec_SQL(sql_update, database_companyconfig_local, "UPDATE",
+			time_2D30, digit_2D30,
+			minbet_2D30, maxbet_2D30, win_2D30, status_2D30,
+			admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"), idcompany)
 
 		if flag_update {
 			msg = "Succes"
