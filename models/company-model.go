@@ -18,6 +18,7 @@ import (
 
 const database_company_local = configs.DB_tbl_mst_company
 const database_companyadmin_local = configs.DB_tbl_mst_company_admin
+const database_companyadminrule_local = configs.DB_tbl_mst_company_adminrule
 
 func Fetch_companyHome(search string, page int) (helpers.Responsercompany, error) {
 	var obj entities.Model_company
@@ -154,10 +155,12 @@ func Fetch_companyHome(search string, page int) (helpers.Responsercompany, error
 
 	return res, nil
 }
-func Fetch_companyadminHome(idcompany string) (helpers.Response, error) {
+func Fetch_companyadminHome(idcompany string) (helpers.Responsercompanyadmin, error) {
 	var obj entities.Model_companyadmin
 	var arraobj []entities.Model_companyadmin
-	var res helpers.Response
+	var objadminrule entities.Model_companyadminruleshare
+	var arraobjadminrule []entities.Model_companyadminruleshare
+	var res helpers.Responsercompanyadmin
 	msg := "Data Not Found"
 	con := db.CreateCon()
 	ctx := context.Background()
@@ -165,25 +168,25 @@ func Fetch_companyadminHome(idcompany string) (helpers.Response, error) {
 
 	sql_select := ""
 	sql_select += "SELECT "
-	sql_select += "idcompadmin, "
-	sql_select += "username, nameadmin, statuscompadmin, "
+	sql_select += "idcompadmin, idcompadminrule, "
+	sql_select += "adminusername, nameadmin, statuscompadmin, "
 	sql_select += "createcompadmin, to_char(COALESCE(createdatecompadmin,now()), 'YYYY-MM-DD HH24:MI:SS'), "
 	sql_select += "updatecompadmin, to_char(COALESCE(updatedatecompadmin,now()), 'YYYY-MM-DD HH24:MI:SS')  "
 	sql_select += "FROM " + database_companyadmin_local + " "
-	sql_select += "WHERE LOWER(idcompany) ='" + idcompany + "' "
+	sql_select += "WHERE idcompany ='" + idcompany + "' "
 	sql_select += "ORDER BY createdatecompadmin DESC   "
-
+	fmt.Println(sql_select)
 	row, err := con.QueryContext(ctx, sql_select)
 	helpers.ErrorCheck(err)
 	for row.Next() {
 		var (
-			idcompadmin_db                                                                         int
-			username_db, nameadmin_db, statuscompadmin_db                                          string
+			idcompadmin_db, idcompadminrule_db                                                     int
+			adminusername_db, nameadmin_db, statuscompadmin_db                                     string
 			createcompadmin_db, createdatecompadmin_db, updatecompadmin_db, updatedatecompadmin_db string
 		)
 
-		err = row.Scan(&idcompadmin_db,
-			&username_db, &nameadmin_db, &statuscompadmin_db,
+		err = row.Scan(&idcompadmin_db, &idcompadminrule_db,
+			&adminusername_db, &nameadmin_db, &statuscompadmin_db,
 			&createcompadmin_db, &createdatecompadmin_db, &updatecompadmin_db, &updatedatecompadmin_db)
 
 		helpers.ErrorCheck(err)
@@ -201,12 +204,98 @@ func Fetch_companyadminHome(idcompany string) (helpers.Response, error) {
 		}
 
 		obj.Companyadmin_id = idcompadmin_db
-		obj.Companyadmin_username = username_db
+		obj.Companyadmin_idrule = idcompadminrule_db
+		obj.Companyadmin_idcompany = idcompany
+		obj.Companyadmin_nmrule = _Get_adminrule(idcompadminrule_db)
+		obj.Companyadmin_username = adminusername_db
 		obj.Companyadmin_name = nameadmin_db
 		obj.Companyadmin_status = statuscompadmin_db
 		obj.Companyadmin_status_css = status_css
 		obj.Companyadmin_create = create
 		obj.Companyadmin_update = update
+		arraobj = append(arraobj, obj)
+		msg = "Success"
+	}
+	defer row.Close()
+
+	sql_selectadminrule := `SELECT 
+			idcompadminrule, nmruleadmin 
+			FROM ` + configs.DB_tbl_mst_company_adminrule + ` 
+			WHERE idcompany='` + idcompany + `'  
+			ORDER BY nmruleadmin ASC    
+	`
+	rowadminrule, erradminrule := con.QueryContext(ctx, sql_selectadminrule)
+	helpers.ErrorCheck(erradminrule)
+	for rowadminrule.Next() {
+		var (
+			idcompadminrule_db int
+			nmruleadmin_db     string
+		)
+
+		erradminrule = rowadminrule.Scan(&idcompadminrule_db, &nmruleadmin_db)
+
+		helpers.ErrorCheck(erradminrule)
+
+		objadminrule.Companyadminrule_id = idcompadminrule_db
+		objadminrule.Companyadminrule_name = nmruleadmin_db
+		arraobjadminrule = append(arraobjadminrule, objadminrule)
+		msg = "Success"
+	}
+	defer rowadminrule.Close()
+
+	res.Status = fiber.StatusOK
+	res.Message = msg
+	res.Record = arraobj
+	res.Listrule = arraobjadminrule
+	res.Time = time.Since(start).String()
+
+	return res, nil
+}
+func Fetch_companyadminruleHome(idcompany string) (helpers.Response, error) {
+	var obj entities.Model_companyadminrule
+	var arraobj []entities.Model_companyadminrule
+	var res helpers.Response
+	msg := "Data Not Found"
+	con := db.CreateCon()
+	ctx := context.Background()
+	start := time.Now()
+
+	sql_select := ""
+	sql_select += "SELECT "
+	sql_select += "idcompadminrule,nmruleadmin, ruleadmin, "
+	sql_select += "createcompadminrule, to_char(COALESCE(createdatecompadminrule,now()), 'YYYY-MM-DD HH24:MI:SS'), "
+	sql_select += "updatecompadminrule, to_char(COALESCE(updatedatecompadminrule,now()), 'YYYY-MM-DD HH24:MI:SS')  "
+	sql_select += "FROM " + database_companyadminrule_local + " "
+	sql_select += "WHERE idcompany ='" + idcompany + "' "
+	sql_select += "ORDER BY createdatecompadminrule DESC   "
+	fmt.Println(sql_select)
+	row, err := con.QueryContext(ctx, sql_select)
+	helpers.ErrorCheck(err)
+	for row.Next() {
+		var (
+			idcompadminrule_db                                                                                     int
+			nmruleadmin_db, ruleadmin_db                                                                           string
+			createcompadminrule_db, createdatecompadminrule_db, updatecompadminrule_db, updatedatecompadminrule_db string
+		)
+
+		err = row.Scan(&idcompadminrule_db, &nmruleadmin_db, &ruleadmin_db,
+			&createcompadminrule_db, &createdatecompadminrule_db, &updatecompadminrule_db, &updatedatecompadminrule_db)
+
+		helpers.ErrorCheck(err)
+		create := ""
+		update := ""
+		if createcompadminrule_db != "" {
+			create = createcompadminrule_db + ", " + createdatecompadminrule_db
+		}
+		if updatecompadminrule_db != "" {
+			update = updatecompadminrule_db + ", " + updatedatecompadminrule_db
+		}
+
+		obj.Companyadminrule_id = idcompadminrule_db
+		obj.Companyadminrule_nmruleadmin = nmruleadmin_db
+		obj.Companyadminrule_ruleadmin = ruleadmin_db
+		obj.Companyadminrule_create = create
+		obj.Companyadminrule_update = update
 		arraobj = append(arraobj, obj)
 		msg = "Success"
 	}
@@ -290,7 +379,7 @@ func Save_company(admin, idrecord, idcurr, nmcompany, nmowner,
 
 	return res, nil
 }
-func Save_companyadmin(admin, idcompany, username, password, name, status, sData string, idrecord int) (helpers.Response, error) {
+func Save_companyadmin(admin, idcompany, username, password, name, status, sData string, idrecord, idrule int) (helpers.Response, error) {
 	var res helpers.Response
 	msg := "Failed"
 	tglnow, _ := goment.New()
@@ -298,16 +387,16 @@ func Save_companyadmin(admin, idcompany, username, password, name, status, sData
 	flag := false
 
 	if sData == "New" {
-		flag = CheckDB(database_company_local, "username", username)
+		flag = CheckDB(database_company_local, "adminusername", username)
 		if !flag {
 			sql_insert := `
 				insert into
 				` + database_companyadmin_local + ` (
-					idcompadmin, idcompany,  username, password, nameadmin, statuscompadmin, 
+					idcompadmin, idcompadminrule, idcompany,  adminusername, adminpassword, nameadmin, statuscompadmin, 
 					createcompadmin, createdatecompadmin 
 				) values (
-					$1, $2, $3, $4, $5, $6, 
-					$7, $8, 
+					$1, $2, $3, $4, $5, $6, $7, 
+					$8, $9 
 				)
 			`
 
@@ -316,7 +405,7 @@ func Save_companyadmin(admin, idcompany, username, password, name, status, sData
 			idrecord_counter := Get_counter(field_column)
 			idrecord := tglnow.Format("YY") + strconv.Itoa(idrecord_counter)
 			flag_insert, msg_insert := Exec_SQL(sql_insert, database_companyadmin_local, "INSERT",
-				idrecord, idcompany, username, hashpass,
+				idrecord, idrule, idcompany, username, hashpass,
 				name, status,
 				admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
 
@@ -332,13 +421,13 @@ func Save_companyadmin(admin, idcompany, username, password, name, status, sData
 		sql_update := `
 				UPDATE 
 				` + database_companyadmin_local + `  
-				SET nameadmin=$1, statuscompadmin=$2, 
-				updatecompadmin=$3, updatedatecompadmin=$4    
-				WHERE idcompadmin=$5 
+				SET idcompadminrule=$1, nameadmin=$2, statuscompadmin=$3, 
+				updatecompadmin=$4, updatedatecompadmin=$5     
+				WHERE idcompadmin=$6  
 			`
 
 		flag_update, msg_update := Exec_SQL(sql_update, database_companyadmin_local, "UPDATE",
-			name, status,
+			idrule, name, status,
 			admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"), idrecord)
 
 		if flag_update {
@@ -355,4 +444,81 @@ func Save_companyadmin(admin, idcompany, username, password, name, status, sData
 	res.Time = time.Since(render_page).String()
 
 	return res, nil
+}
+func Save_companyadminrule(admin, idcompany, name, rule, sData string, idrecord int) (helpers.Response, error) {
+	var res helpers.Response
+	msg := "Failed"
+	tglnow, _ := goment.New()
+	render_page := time.Now()
+
+	if sData == "New" {
+		sql_insert := `
+				insert into
+				` + database_companyadminrule_local + ` (
+					idcompadminrule, idcompany,  nmruleadmin, ruleadmin, 
+					createcompadminrule, createdatecompadminrule 
+				) values (
+					$1, $2, $3, $4,
+					$5, $6 
+				)
+			`
+
+		field_column := database_companyadminrule_local + strings.ToLower(idcompany) + tglnow.Format("YYYY")
+		idrecord_counter := Get_counter(field_column)
+		idrecord := tglnow.Format("YY") + strconv.Itoa(idrecord_counter)
+		flag_insert, msg_insert := Exec_SQL(sql_insert, database_companyadminrule_local, "INSERT",
+			idrecord, idcompany, name, rule,
+			admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
+
+		if flag_insert {
+			msg = "Succes"
+		} else {
+			fmt.Println(msg_insert)
+		}
+	} else {
+		sql_update := `
+				UPDATE 
+				` + database_companyadminrule_local + `  
+				SET nmruleadmin=$1, ruleadmin=$2, 
+				updatecompadminrule=$3, updatedatecompadminrule=$4     
+				WHERE idcompadminrule=$5   
+			`
+
+		flag_update, msg_update := Exec_SQL(sql_update, database_companyadminrule_local, "UPDATE",
+			name, rule,
+			admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"), idrecord)
+
+		if flag_update {
+			msg = "Succes"
+		} else {
+			fmt.Println(msg_update)
+		}
+	}
+
+	res.Status = fiber.StatusOK
+	res.Message = msg
+	res.Record = nil
+	res.Time = time.Since(render_page).String()
+
+	return res, nil
+}
+func _Get_adminrule(idrule int) string {
+	con := db.CreateCon()
+	ctx := context.Background()
+	rule := ""
+	sql_select := `SELECT
+			nmruleadmin    
+			FROM ` + database_companyadminrule_local + `  
+			WHERE idcompadminrule='` + strconv.Itoa(idrule) + `'       
+		`
+
+	row := con.QueryRowContext(ctx, sql_select)
+	switch e := row.Scan(&rule); e {
+	case sql.ErrNoRows:
+	case nil:
+	default:
+		helpers.ErrorCheck(e)
+	}
+
+	return rule
 }

@@ -7,6 +7,7 @@ const (
 	DB_tbl_mst_curr                   string = "tbl_mst_currency"
 	DB_tbl_mst_company                string = "tbl_mst_company"
 	DB_tbl_mst_company_admin          string = "tbl_mst_company_admin"
+	DB_tbl_mst_company_adminrule      string = "tbl_mst_company_adminrule"
 	DB_tbl_mst_uom                    string = "tbl_mst_uom"
 	DB_tbl_mst_branch                 string = "tbl_mst_branch"
 	DB_tbl_mst_warehouse              string = "tbl_mst_warehouse"

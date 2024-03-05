@@ -20,7 +20,9 @@ type Model_company struct {
 }
 type Model_companyadmin struct {
 	Companyadmin_id         int    `json:"companyadmin_id"`
+	Companyadmin_idrule     int    `json:"companyadmin_idrule"`
 	Companyadmin_idcompany  string `json:"companyadmin_idcompany"`
+	Companyadmin_nmrule     string `json:"companyadmin_nmrule"`
 	Companyadmin_username   string `json:"companyadmin_username"`
 	Companyadmin_name       string `json:"companyadmin_name"`
 	Companyadmin_status     string `json:"companyadmin_status"`
@@ -28,9 +30,20 @@ type Model_companyadmin struct {
 	Companyadmin_create     string `json:"companyadmin_create"`
 	Companyadmin_update     string `json:"companyadmin_update"`
 }
+type Model_companyadminrule struct {
+	Companyadminrule_id          int    `json:"companyadminrule_id"`
+	Companyadminrule_nmruleadmin string `json:"companyadminrule_nmruleadmin"`
+	Companyadminrule_ruleadmin   string `json:"companyadminrule_ruleadmin"`
+	Companyadminrule_create      string `json:"companyadminrule_create"`
+	Companyadminrule_update      string `json:"companyadminrule_update"`
+}
 type Model_companyshare struct {
 	Company_id   string `json:"company_id"`
 	Company_name string `json:"company_name"`
+}
+type Model_companyadminruleshare struct {
+	Companyadminrule_id   int    `json:"companyadminrule_id"`
+	Companyadminrule_name string `json:"companyadminrule_name"`
 }
 
 type Controller_companysave struct {
@@ -55,10 +68,19 @@ type Controller_companyadminsave struct {
 	Sdata                  string `json:"sdata" validate:"required"`
 	Companyadmin_id        int    `json:"companyadmin_id"`
 	Companyadmin_idcompany string `json:"companyadmin_idcompany" validate:"required"`
+	Companyadmin_idrule    int    `json:"companyadmin_idrule" validate:"required"`
 	Companyadmin_username  string `json:"companyadmin_username" validate:"required"`
 	Companyadmin_password  string `json:"companyadmin_password`
 	Companyadmin_name      string `json:"companyadmin_name" validate:"required"`
 	Companyadmin_status    string `json:"companyadmin_status" validate:"required"`
+}
+type Controller_companyadminrulesave struct {
+	Page                         string `json:"page" validate:"required"`
+	Sdata                        string `json:"sdata" validate:"required"`
+	Companyadminrule_id          int    `json:"companyadminrule_id"`
+	Companyadminrule_idcompany   string `json:"companyadminrule_idcompany" validate:"required"`
+	Companyadminrule_nmruleadmin string `json:"companyadminrule_nmruleadmin" validate:"required"`
+	Companyadminrule_ruleadmin   string `json:"companyadminrule_ruleadmin" validate:"required"`
 }
 type Controller_company struct {
 	Company_search string `json:"company_search"`

@@ -23,6 +23,13 @@ type Responsercompany struct {
 	Totalrecord int         `json:"totalrecord"`
 	Time        string      `json:"time"`
 }
+type Responsercompanyadmin struct {
+	Status   int         `json:"status"`
+	Message  string      `json:"message"`
+	Record   interface{} `json:"record"`
+	Listrule interface{} `json:"listrule"`
+	Time     string      `json:"time"`
+}
 type Responserfq struct {
 	Status      int         `json:"status"`
 	Message     string      `json:"message"`
