@@ -571,7 +571,7 @@ func Save_companyadminrule(admin, idcompany, name, rule, sData string, idrecord 
 
 	return res, nil
 }
-func Save_companyconf(admin, idcompany, status_2D30, sData string,
+func Save_companyconf(admin, idcompany, status_2D30 string,
 	time_2D30, digit_2D30, minbet_2D30, maxbet_2D30 int,
 	win_2D30 float64) (helpers.Response, error) {
 	var res helpers.Response
@@ -580,14 +580,13 @@ func Save_companyconf(admin, idcompany, status_2D30, sData string,
 	render_page := time.Now()
 	flag := false
 
-	if sData == "New" {
-		flag = CheckDB(database_companyconfig_local, "idcompany", idcompany)
-		if !flag {
-			sql_insert := `
+	flag = CheckDB(database_companyconfig_local, "idcompany", idcompany)
+	if !flag {
+		sql_insert := `
 				insert into
 				` + database_companyconfig_local + ` (
 					idcompany, conf_2digit_30_time,  conf_2digit_30_digit, 
-					conf_2digit_30_minbet, conf_2digit_30_maxbet, conf_2digit_30_win, conf_2digit_30_status 
+					conf_2digit_30_minbet, conf_2digit_30_maxbet, conf_2digit_30_win, conf_2digit_30_status, 
 					createconf, createdateconf 
 				) values (
 					$1, $2, $3, 
@@ -596,18 +595,15 @@ func Save_companyconf(admin, idcompany, status_2D30, sData string,
 				)
 			`
 
-			flag_insert, msg_insert := Exec_SQL(sql_insert, database_companyconfig_local, "INSERT",
-				idcompany, time_2D30, digit_2D30,
-				minbet_2D30, maxbet_2D30, win_2D30, status_2D30,
-				admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
+		flag_insert, msg_insert := Exec_SQL(sql_insert, database_companyconfig_local, "INSERT",
+			idcompany, time_2D30, digit_2D30,
+			minbet_2D30, maxbet_2D30, win_2D30, status_2D30,
+			admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
 
-			if flag_insert {
-				msg = "Succes"
-			} else {
-				fmt.Println(msg_insert)
-			}
+		if flag_insert {
+			msg = "Succes"
 		} else {
-			msg = "Duplicate Entry"
+			fmt.Println(msg_insert)
 		}
 	} else {
 		sql_update := `

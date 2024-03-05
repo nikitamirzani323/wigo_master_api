@@ -96,7 +96,6 @@ type Controller_companyadminrulesave struct {
 }
 type Controller_companyconfsave struct {
 	Page                         string  `json:"page" validate:"required"`
-	Sdata                        string  `json:"sdata" validate:"required"`
 	Companyconf_id               string  `json:"companyconf_id" validate:"required"`
 	Companyconf_2digit_30_time   int     `json:"companyconf_2digit_30_time" validate:"required"`
 	Companyconf_2digit_30_digit  int     `json:"companyconf_2digit_30_digit" validate:"required"`

@@ -574,7 +574,7 @@ func CompanyconfSave(c *fiber.Ctx) error {
 	// win_2D30 float64
 	result, err := models.Save_companyconf(
 		client_admin,
-		client.Companyconf_id, client.Companyconf_2digit_30_status, client.Sdata,
+		client.Companyconf_id, client.Companyconf_2digit_30_status,
 		client.Companyconf_2digit_30_time, client.Companyconf_2digit_30_digit,
 		client.Companyconf_2digit_30_minbet, client.Companyconf_2digit_30_maxbet,
 		client.Companyconf_2digit_30_win)
