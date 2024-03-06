@@ -375,7 +375,8 @@ func Fetch_companyconfHome(idcompany string) (helpers.Response, error) {
 	sql_select := ""
 	sql_select += "SELECT "
 	sql_select += "conf_2digit_30_time, conf_2digit_30_digit, "
-	sql_select += "conf_2digit_30_minbet, conf_2digit_30_maxbet,conf_2digit_30_win,conf_2digit_30_status,  "
+	sql_select += "conf_2digit_30_minbet, conf_2digit_30_maxbet,conf_2digit_30_win,   "
+	sql_select += "conf_2digit_30_maintenance, conf_2digit_30_status,  "
 	sql_select += "createconf, to_char(COALESCE(createdateconf,now()), 'YYYY-MM-DD HH24:MI:SS'), "
 	sql_select += "updateconf, to_char(COALESCE(updatedateconf,now()), 'YYYY-MM-DD HH24:MI:SS')  "
 	sql_select += "FROM " + database_companyconfig_local + " "
@@ -387,23 +388,27 @@ func Fetch_companyconfHome(idcompany string) (helpers.Response, error) {
 		var (
 			conf_2digit_30_time_db, conf_2digit_30_digit_db, conf_2digit_30_minbet_db, conf_2digit_30_maxbet_db int
 			conf_2digit_30_win_db                                                                               float64
-			conf_2digit_30_status_db                                                                            string
+			conf_2digit_30_maintenance_db, conf_2digit_30_status_db                                             string
 			createconf_db, createdateconf_db, updateconf_db, updatedateconf_db                                  string
 		)
 
 		err = row.Scan(&conf_2digit_30_time_db, &conf_2digit_30_digit_db, &conf_2digit_30_minbet_db,
-			&conf_2digit_30_maxbet_db, &conf_2digit_30_win_db, &conf_2digit_30_status_db,
+			&conf_2digit_30_maxbet_db, &conf_2digit_30_win_db, &conf_2digit_30_maintenance_db, &conf_2digit_30_status_db,
 			&createconf_db, &createdateconf_db, &updateconf_db, &updatedateconf_db)
 
 		helpers.ErrorCheck(err)
 		create := ""
 		update := ""
+		maintenance_css := configs.STATUS_CANCEL
 		status_css := configs.STATUS_CANCEL
 		if createconf_db != "" {
 			create = createconf_db + ", " + createdateconf_db
 		}
 		if updateconf_db != "" {
 			update = updateconf_db + ", " + updatedateconf_db
+		}
+		if conf_2digit_30_maintenance_db == "Y" {
+			maintenance_css = configs.STATUS_COMPLETE
 		}
 		if conf_2digit_30_status_db == "Y" {
 			status_css = configs.STATUS_COMPLETE
@@ -415,6 +420,8 @@ func Fetch_companyconfHome(idcompany string) (helpers.Response, error) {
 		obj.Companyconf_2digit_30_minbet = conf_2digit_30_minbet_db
 		obj.Companyconf_2digit_30_maxbet = conf_2digit_30_maxbet_db
 		obj.Companyconf_2digit_30_win = conf_2digit_30_win_db
+		obj.Companyconf_2digit_30_maintenance = conf_2digit_30_maintenance_db
+		obj.Companyconf_2digit_30_maintenance_css = maintenance_css
 		obj.Companyconf_2digit_30_status = conf_2digit_30_status_db
 		obj.Companyconf_2digit_30_status_css = status_css
 		obj.Companyconf_create = create
@@ -691,7 +698,7 @@ func Delete_companymoney(idcompany string, idrecord int) (helpers.Response, erro
 
 	return res, nil
 }
-func Save_companyconf(admin, idcompany, status_2D30 string,
+func Save_companyconf(admin, idcompany, status_2D30, maintenance_2D30 string,
 	time_2D30, digit_2D30, minbet_2D30, maxbet_2D30 int,
 	win_2D30 float64) (helpers.Response, error) {
 	var res helpers.Response
@@ -706,18 +713,18 @@ func Save_companyconf(admin, idcompany, status_2D30 string,
 				insert into
 				` + database_companyconfig_local + ` (
 					idcompany, conf_2digit_30_time,  conf_2digit_30_digit, 
-					conf_2digit_30_minbet, conf_2digit_30_maxbet, conf_2digit_30_win, conf_2digit_30_status, 
+					conf_2digit_30_minbet, conf_2digit_30_maxbet, conf_2digit_30_win, conf_2digit_30_maintenance, conf_2digit_30_status, 
 					createconf, createdateconf 
 				) values (
 					$1, $2, $3, 
-					$4, $5, $6 ,$7, 
-					$8, $9 
+					$4, $5, $6 ,$7, $8, 
+					$9, $10 
 				)
 			`
 
 		flag_insert, msg_insert := Exec_SQL(sql_insert, database_companyconfig_local, "INSERT",
 			idcompany, time_2D30, digit_2D30,
-			minbet_2D30, maxbet_2D30, win_2D30, status_2D30,
+			minbet_2D30, maxbet_2D30, win_2D30, maintenance_2D30, status_2D30,
 			admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
 
 		if flag_insert {
@@ -730,14 +737,15 @@ func Save_companyconf(admin, idcompany, status_2D30 string,
 				UPDATE 
 				` + database_companyconfig_local + `  
 				SET conf_2digit_30_time=$1, conf_2digit_30_digit=$2, 
-				conf_2digit_30_minbet=$3, conf_2digit_30_maxbet=$4, conf_2digit_30_win=$5, conf_2digit_30_status=$6,   
-				updateconf=$7, updatedateconf=$8     
-				WHERE idcompany=$9   
+				conf_2digit_30_minbet=$3, conf_2digit_30_maxbet=$4, conf_2digit_30_win=$5, 
+				conf_2digit_30_maintenance=$6, conf_2digit_30_status=$7,   
+				updateconf=$8, updatedateconf=$9      
+				WHERE idcompany=$10   
 			`
 
 		flag_update, msg_update := Exec_SQL(sql_update, database_companyconfig_local, "UPDATE",
 			time_2D30, digit_2D30,
-			minbet_2D30, maxbet_2D30, win_2D30, status_2D30,
+			minbet_2D30, maxbet_2D30, win_2D30, maintenance_2D30, status_2D30,
 			admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"), idcompany)
 
 		if flag_update {

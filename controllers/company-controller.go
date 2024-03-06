@@ -410,6 +410,8 @@ func Companyconfhome(c *fiber.Ctx) error {
 		companyconf_2digit_30_minbet, _ := jsonparser.GetInt(value, "companyconf_2digit_30_minbet")
 		companyconf_2digit_30_maxbet, _ := jsonparser.GetInt(value, "companyconf_2digit_30_maxbet")
 		companyconf_2digit_30_win, _ := jsonparser.GetFloat(value, "companyconf_2digit_30_win")
+		companyconf_2digit_30_maintenance, _ := jsonparser.GetString(value, "companyconf_2digit_30_maintenance")
+		companyconf_2digit_30_maintenance_css, _ := jsonparser.GetString(value, "companyconf_2digit_30_maintenance_css")
 		companyconf_2digit_30_status, _ := jsonparser.GetString(value, "companyconf_2digit_30_status")
 		companyconf_2digit_30_status_css, _ := jsonparser.GetString(value, "companyconf_2digit_30_status_css")
 		companyconf_create, _ := jsonparser.GetString(value, "companyconf_create")
@@ -421,6 +423,8 @@ func Companyconfhome(c *fiber.Ctx) error {
 		obj.Companyconf_2digit_30_minbet = int(companyconf_2digit_30_minbet)
 		obj.Companyconf_2digit_30_maxbet = int(companyconf_2digit_30_maxbet)
 		obj.Companyconf_2digit_30_win = float64(companyconf_2digit_30_win)
+		obj.Companyconf_2digit_30_maintenance = companyconf_2digit_30_maintenance
+		obj.Companyconf_2digit_30_maintenance_css = companyconf_2digit_30_maintenance_css
 		obj.Companyconf_2digit_30_status = companyconf_2digit_30_status
 		obj.Companyconf_2digit_30_status_css = companyconf_2digit_30_status_css
 		obj.Companyconf_create = companyconf_create
@@ -742,12 +746,12 @@ func CompanyconfSave(c *fiber.Ctx) error {
 	temp_decp := helpers.Decryption(name)
 	client_admin, _ := helpers.Parsing_Decry(temp_decp, "==")
 
-	// admin, idcompany, status_2D30, sData string,
+	// admin, idcompany, status_2D30, maintenance_2D30 string,
 	// time_2D30, digit_2D30, minbet_2D30, maxbet_2D30 int,
 	// win_2D30 float64
 	result, err := models.Save_companyconf(
 		client_admin,
-		client.Companyconf_id, client.Companyconf_2digit_30_status,
+		client.Companyconf_id, client.Companyconf_2digit_30_status, client.Companyconf_2digit_30_maintenance,
 		client.Companyconf_2digit_30_time, client.Companyconf_2digit_30_digit,
 		client.Companyconf_2digit_30_minbet, client.Companyconf_2digit_30_maxbet,
 		client.Companyconf_2digit_30_win)
