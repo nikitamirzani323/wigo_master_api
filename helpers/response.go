@@ -30,6 +30,14 @@ type Responsercompanyadmin struct {
 	Listrule interface{} `json:"listrule"`
 	Time     string      `json:"time"`
 }
+type Responsercompanymoney struct {
+	Status  int         `json:"status"`
+	Message string      `json:"message"`
+	Record  interface{} `json:"record"`
+	Minbet  int         `json:"minbet"`
+	Maxbet  int         `json:"maxbet"`
+	Time    string      `json:"time"`
+}
 type Responserfq struct {
 	Status      int         `json:"status"`
 	Message     string      `json:"message"`

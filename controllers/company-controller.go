@@ -18,6 +18,7 @@ import (
 const Fieldcompany_home_redis = "LISTCOMPANY_BACKEND"
 const Fieldcompanyadmin_home_redis = "LISTCOMPANYADMIN_BACKEND"
 const Fieldcompanyadminrule_home_redis = "LISTCOMPANYADMINRULE_BACKEND"
+const Fieldcompanymoney_home_redis = "LISTCOMPANYMONEY_BACKEND"
 const Fieldcompanyconf_home_redis = "LISTCOMPANYCONF_BACKEND"
 
 func Companyhome(c *fiber.Ctx) error {
@@ -296,6 +297,77 @@ func Companyadminrulehome(c *fiber.Ctx) error {
 		})
 	}
 }
+func Companymoneyhome(c *fiber.Ctx) error {
+	var errors []*helpers.ErrorResponse
+	client := new(entities.Controller_companyadmin)
+	validate := validator.New()
+	if err := c.BodyParser(client); err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+			"record":  nil,
+		})
+	}
+
+	err := validate.Struct(client)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			var element helpers.ErrorResponse
+			element.Field = err.StructField()
+			element.Tag = err.Tag()
+			errors = append(errors, &element)
+		}
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": "validation",
+			"record":  errors,
+		})
+	}
+
+	var obj entities.Model_companymoney
+	var arraobj []entities.Model_companymoney
+	render_page := time.Now()
+	resultredis, flag := helpers.GetRedis(Fieldcompanymoney_home_redis + "_" + strings.ToLower(client.Companyadmin_idcompany))
+	jsonredis := []byte(resultredis)
+	record_RD, _, _, _ := jsonparser.Get(jsonredis, "record")
+	jsonparser.ArrayEach(record_RD, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		companymoney_id, _ := jsonparser.GetInt(value, "companymoney_id")
+		companymoney_money, _ := jsonparser.GetInt(value, "companymoney_money")
+		companymoney_create, _ := jsonparser.GetString(value, "companymoney_create")
+		companymoney_update, _ := jsonparser.GetString(value, "companymoney_update")
+
+		obj.Companymoney_id = int(companymoney_id)
+		obj.Companymoney_money = int(companymoney_money)
+		obj.Companymoney_create = companymoney_create
+		obj.Companymoney_update = companymoney_update
+		arraobj = append(arraobj, obj)
+	})
+
+	if !flag {
+		result, err := models.Fetch_companymoneyHome(client.Companyadmin_idcompany)
+		if err != nil {
+			c.Status(fiber.StatusBadRequest)
+			return c.JSON(fiber.Map{
+				"status":  fiber.StatusBadRequest,
+				"message": err.Error(),
+				"record":  nil,
+			})
+		}
+		helpers.SetRedis(Fieldcompanymoney_home_redis+"_"+strings.ToLower(client.Companyadmin_idcompany), result, 60*time.Minute)
+		fmt.Println("COMPANY MONEY DATABASE")
+		return c.JSON(result)
+	} else {
+		fmt.Println("COMPANY MONEY CACHE")
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusOK,
+			"message": "Success",
+			"record":  arraobj,
+			"time":    time.Since(render_page).String(),
+		})
+	}
+}
 func Companyconfhome(c *fiber.Ctx) error {
 	var errors []*helpers.ErrorResponse
 	client := new(entities.Controller_companyadmin)
@@ -535,6 +607,107 @@ func CompanyadminruleSave(c *fiber.Ctx) error {
 	_deleteredis_company(client.Companyadminrule_idcompany)
 	return c.JSON(result)
 }
+func CompanymoneySave(c *fiber.Ctx) error {
+	var errors []*helpers.ErrorResponse
+	client := new(entities.Controller_companymoneysave)
+	validate := validator.New()
+	if err := c.BodyParser(client); err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+			"record":  nil,
+		})
+	}
+
+	err := validate.Struct(client)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			var element helpers.ErrorResponse
+			element.Field = err.StructField()
+			element.Tag = err.Tag()
+			errors = append(errors, &element)
+		}
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": "validation",
+			"record":  errors,
+		})
+	}
+	user := c.Locals("jwt").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	name := claims["name"].(string)
+	temp_decp := helpers.Decryption(name)
+	client_admin, _ := helpers.Parsing_Decry(temp_decp, "==")
+
+	// admin, idcompany, sData string, money int
+	result, err := models.Save_companymoney(
+		client_admin,
+		client.Companymoney_idcompany,
+		client.Sdata, client.Companymoney_money)
+	if err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+			"record":  nil,
+		})
+	}
+
+	_deleteredis_company(client.Companymoney_idcompany)
+	return c.JSON(result)
+}
+func CompanymoneyDelete(c *fiber.Ctx) error {
+	var errors []*helpers.ErrorResponse
+	client := new(entities.Controller_companymoneydelete)
+	validate := validator.New()
+	if err := c.BodyParser(client); err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+			"record":  nil,
+		})
+	}
+
+	err := validate.Struct(client)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			var element helpers.ErrorResponse
+			element.Field = err.StructField()
+			element.Tag = err.Tag()
+			errors = append(errors, &element)
+		}
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": "validation",
+			"record":  errors,
+		})
+	}
+	// user := c.Locals("jwt").(*jwt.Token)
+	// claims := user.Claims.(jwt.MapClaims)
+	// name := claims["name"].(string)
+	// temp_decp := helpers.Decryption(name)
+	// client_admin, _ := helpers.Parsing_Decry(temp_decp, "==")
+
+	// idcompany string, idrecord int
+	result, err := models.Delete_companymoney(
+		client.Companymoney_idcompany,
+		client.Companymoney_id)
+	if err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+			"record":  nil,
+		})
+	}
+
+	_deleteredis_company(client.Companymoney_idcompany)
+	return c.JSON(result)
+}
 func CompanyconfSave(c *fiber.Ctx) error {
 	var errors []*helpers.ErrorResponse
 	client := new(entities.Controller_companyconfsave)
@@ -600,5 +773,7 @@ func _deleteredis_company(idcompany string) {
 	fmt.Printf("Redis Delete BACKEND COMPANY ADMIN : %d", val_compadmin)
 	val_compadminrule := helpers.DeleteRedis(Fieldcompanyadminrule_home_redis + "_" + strings.ToLower(idcompany))
 	fmt.Printf("Redis Delete BACKEND COMPANY ADMINRULE : %d", val_compadminrule)
+	val_compmoney := helpers.DeleteRedis(Fieldcompanymoney_home_redis + "_" + strings.ToLower(idcompany))
+	fmt.Printf("Redis Delete BACKEND COMPANY MONEY : %d", val_compmoney)
 
 }

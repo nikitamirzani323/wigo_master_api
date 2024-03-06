@@ -49,6 +49,12 @@ type Model_companyconf struct {
 	Companyconf_create               string  `json:"companyconf_create"`
 	Companyconf_update               string  `json:"companyconf_update"`
 }
+type Model_companymoney struct {
+	Companymoney_id     int    `json:"companymoney_id"`
+	Companymoney_money  int    `json:"companymoney_money"`
+	Companymoney_create string `json:"companymoney_create"`
+	Companymoney_update string `json:"companymoney_update"`
+}
 type Model_companyshare struct {
 	Company_id   string `json:"company_id"`
 	Company_name string `json:"company_name"`
@@ -94,6 +100,12 @@ type Controller_companyadminrulesave struct {
 	Companyadminrule_nmruleadmin string `json:"companyadminrule_nmruleadmin" validate:"required"`
 	Companyadminrule_ruleadmin   string `json:"companyadminrule_ruleadmin" validate:"required"`
 }
+type Controller_companymoneysave struct {
+	Page                   string `json:"page" validate:"required"`
+	Sdata                  string `json:"sdata" validate:"required"`
+	Companymoney_idcompany string `json:"companymoney_idcompany" validate:"required"`
+	Companymoney_money     int    `json:"companymoney_money" validate:"required"`
+}
 type Controller_companyconfsave struct {
 	Page                         string  `json:"page" validate:"required"`
 	Companyconf_id               string  `json:"companyconf_id" validate:"required"`
@@ -110,4 +122,8 @@ type Controller_company struct {
 }
 type Controller_companyadmin struct {
 	Companyadmin_idcompany string `json:"companyadmin_idcompany" `
+}
+type Controller_companymoneydelete struct {
+	Companymoney_id        int    `json:"companymoney_id" `
+	Companymoney_idcompany string `json:"companymoney_idcompany" `
 }

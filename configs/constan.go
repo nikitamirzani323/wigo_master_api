@@ -9,6 +9,7 @@ const (
 	DB_tbl_mst_company_admin     string = "tbl_mst_company_admin"
 	DB_tbl_mst_company_adminrule string = "tbl_mst_company_adminrule"
 	DB_tbl_mst_company_config    string = "tbl_mst_company_config"
+	DB_tbl_mst_company_money     string = "tbl_mst_company_money"
 
 	PAGING_PAGE     int    = 50
 	STATUS_NEW      string = "background:#0dcaf0;font-weight:bold;color:black;"

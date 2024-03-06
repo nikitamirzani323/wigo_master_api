@@ -20,6 +20,7 @@ const database_company_local = configs.DB_tbl_mst_company
 const database_companyadmin_local = configs.DB_tbl_mst_company_admin
 const database_companyadminrule_local = configs.DB_tbl_mst_company_adminrule
 const database_companyconfig_local = configs.DB_tbl_mst_company_config
+const database_companymoney_local = configs.DB_tbl_mst_company_money
 
 func Fetch_companyHome(search string, page int) (helpers.Responsercompany, error) {
 	var obj entities.Model_company
@@ -309,6 +310,59 @@ func Fetch_companyadminruleHome(idcompany string) (helpers.Response, error) {
 
 	return res, nil
 }
+func Fetch_companymoneyHome(idcompany string) (helpers.Response, error) {
+	var obj entities.Model_companymoney
+	var arraobj []entities.Model_companymoney
+	var res helpers.Response
+	msg := "Data Not Found"
+	con := db.CreateCon()
+	ctx := context.Background()
+	start := time.Now()
+
+	sql_select := ""
+	sql_select += "SELECT "
+	sql_select += "idcompmoney, compmoney, "
+	sql_select += "createcompmoney, to_char(COALESCE(createdatecompmoney,now()), 'YYYY-MM-DD HH24:MI:SS'), "
+	sql_select += "updatecompmoney, to_char(COALESCE(updatedatecompmoney,now()), 'YYYY-MM-DD HH24:MI:SS')  "
+	sql_select += "FROM " + database_companymoney_local + " "
+	sql_select += "WHERE idcompany ='" + idcompany + "' "
+	fmt.Println(sql_select)
+	row, err := con.QueryContext(ctx, sql_select)
+	helpers.ErrorCheck(err)
+	for row.Next() {
+		var (
+			idcompmoney_db, compmoney_db                                               int
+			createcompmoney, createdatecompmoney, updatecompmoney, updatedatecompmoney string
+		)
+
+		err = row.Scan(&idcompmoney_db, &compmoney_db,
+			&createcompmoney, &createdatecompmoney, &updatecompmoney, &updatedatecompmoney)
+
+		helpers.ErrorCheck(err)
+		create := ""
+		update := ""
+		if createcompmoney != "" {
+			create = createcompmoney + ", " + createdatecompmoney
+		}
+		if updatecompmoney != "" {
+			update = updatecompmoney + ", " + updatedatecompmoney
+		}
+
+		obj.Companymoney_id = idcompmoney_db
+		obj.Companymoney_money = compmoney_db
+		obj.Companymoney_create = create
+		obj.Companymoney_update = update
+		arraobj = append(arraobj, obj)
+		msg = "Success"
+	}
+	defer row.Close()
+
+	res.Status = fiber.StatusOK
+	res.Message = msg
+	res.Record = arraobj
+	res.Time = time.Since(start).String()
+	return res, nil
+}
 func Fetch_companyconfHome(idcompany string) (helpers.Response, error) {
 	var obj entities.Model_companyconf
 	var arraobj []entities.Model_companyconf
@@ -562,6 +616,72 @@ func Save_companyadminrule(admin, idcompany, name, rule, sData string, idrecord 
 		} else {
 			fmt.Println(msg_update)
 		}
+	}
+
+	res.Status = fiber.StatusOK
+	res.Message = msg
+	res.Record = nil
+	res.Time = time.Since(render_page).String()
+
+	return res, nil
+}
+func Save_companymoney(admin, idcompany, sData string, money int) (helpers.Response, error) {
+	var res helpers.Response
+	msg := "Failed"
+	tglnow, _ := goment.New()
+	render_page := time.Now()
+
+	if sData == "New" {
+		sql_insert := `
+				insert into
+				` + database_companymoney_local + ` (
+					idcompmoney, idcompany,  compmoney, 
+					createcompmoney, createdatecompmoney 
+				) values (
+					$1, $2, $3, 
+					$4, $5 
+				)
+			`
+
+		field_column := database_companymoney_local + strings.ToLower(idcompany) + tglnow.Format("YYYY")
+		idrecord_counter := Get_counter(field_column)
+		idrecord := tglnow.Format("YY") + strconv.Itoa(idrecord_counter)
+		flag_insert, msg_insert := Exec_SQL(sql_insert, database_companymoney_local, "INSERT",
+			idrecord, idcompany, money,
+			admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
+
+		if flag_insert {
+			msg = "Succes"
+		} else {
+			fmt.Println(msg_insert)
+		}
+	}
+
+	res.Status = fiber.StatusOK
+	res.Message = msg
+	res.Record = nil
+	res.Time = time.Since(render_page).String()
+
+	return res, nil
+}
+func Delete_companymoney(idcompany string, idrecord int) (helpers.Response, error) {
+	var res helpers.Response
+	msg := "Failed"
+	render_page := time.Now()
+
+	sql_delete := `
+		DELETE FROM  
+		` + database_companymoney_local + `   
+		WHERE idcompmoney=$1  
+		AND idcompany=$2  
+	`
+
+	flag_delete, msg_delete := Exec_SQL(sql_delete, database_companymoney_local, "DELETE", idrecord, idcompany)
+
+	if flag_delete {
+		msg = "Succes"
+	} else {
+		fmt.Println(msg_delete)
 	}
 
 	res.Status = fiber.StatusOK
