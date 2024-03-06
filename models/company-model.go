@@ -522,22 +522,22 @@ func Save_companyadmin(admin, idcompany, username, password, name, status, sData
 			sql_insert := `
 				insert into
 				` + database_companyadmin_local + ` (
-					idcompadmin, idcompadminrule, idcompany,  adminusername, adminpassword, nameadmin, statuscompadmin, 
+					idcompadmin, idcompadminrule, idcompany,  adminusername, adminpassword, nameadmin, statuscompadmin, lastlogincompadmin, 
 					createcompadmin, createdatecompadmin 
 				) values (
-					$1, $2, $3, $4, $5, $6, $7, 
-					$8, $9 
+					$1, $2, $3, $4, $5, $6, $7, $8,
+					$9, $10  
 				)
 			`
-
+			start := tglnow.Format("YYYY-MM-DD HH:mm:ss")
 			hashpass := helpers.HashPasswordMD5(password)
 			field_column := database_companyadmin_local + strings.ToLower(idcompany) + tglnow.Format("YYYY")
 			idrecord_counter := Get_counter(field_column)
 			idrecord := tglnow.Format("YY") + strconv.Itoa(idrecord_counter)
 			flag_insert, msg_insert := Exec_SQL(sql_insert, database_companyadmin_local, "INSERT",
 				idrecord, idrule, idcompany, username, hashpass,
-				name, status,
-				admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
+				name, status, start,
+				admin, start)
 
 			if flag_insert {
 				msg = "Succes"
