@@ -517,7 +517,7 @@ func Save_companyadmin(admin, idcompany, username, password, name, status, sData
 	flag := false
 
 	if sData == "New" {
-		flag = CheckDBTwoField(database_company_local, "idcompany", idcompany, "adminusername", username)
+		flag = CheckDB(database_company_local, "adminusername", username)
 		if !flag {
 			sql_insert := `
 				insert into
