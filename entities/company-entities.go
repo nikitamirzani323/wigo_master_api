@@ -44,6 +44,8 @@ type Model_companyconf struct {
 	Companyconf_2digit_30_minbet          int     `json:"companyconf_2digit_30_minbet"`
 	Companyconf_2digit_30_maxbet          int     `json:"companyconf_2digit_30_maxbet"`
 	Companyconf_2digit_30_win             float64 `json:"companyconf_2digit_30_win"`
+	Companyconf_2digit_30_operator        string  `json:"companyconf_2digit_30_operator"`
+	Companyconf_2digit_30_operator_css    string  `json:"companyconf_2digit_30_operator_css"`
 	Companyconf_2digit_30_maintenance     string  `json:"companyconf_2digit_30_maintenance"`
 	Companyconf_2digit_30_maintenance_css string  `json:"companyconf_2digit_30_maintenance_css"`
 	Companyconf_2digit_30_status          string  `json:"companyconf_2digit_30_status"`
@@ -116,6 +118,7 @@ type Controller_companyconfsave struct {
 	Companyconf_2digit_30_minbet      int     `json:"companyconf_2digit_30_minbet" validate:"required"`
 	Companyconf_2digit_30_maxbet      int     `json:"companyconf_2digit_30_maxbet" validate:"required"`
 	Companyconf_2digit_30_win         float64 `json:"companyconf_2digit_30_win" validate:"required"`
+	Companyconf_2digit_30_operator    string  `json:"companyconf_2digit_30_operator" validate:"required"`
 	Companyconf_2digit_30_maintenance string  `json:"companyconf_2digit_30_maintenance" validate:"required"`
 	Companyconf_2digit_30_status      string  `json:"companyconf_2digit_30_status" validate:"required"`
 }
