@@ -780,6 +780,26 @@ func Save_companyconf(admin, idcompany, status_2D30, maintenance_2D30 string, op
 		}
 	}
 
+	fieldconfig_redis := "CONFIG_ALL_" + strings.ToLower(idcompany)
+	type Configure struct {
+		Minbet              int     `json:"minbet"`
+		Maxbet              int     `json:"maxbet"`
+		Win_angka           float64 `json:"win_angka"`
+		Win_redblack        float64 `json:"win_redblack"`
+		Win_line            float64 `json:"win_line"`
+		Status_redblackline string  `json:"status_redblackline"`
+		Status_maintenance  string  `json:"status_maintenance"`
+	}
+	var obj Configure
+	obj.Minbet = minbet_2D30
+	obj.Maxbet = maxbet_2D30
+	obj.Win_angka = win_2D30
+	obj.Win_redblack = win_redblack_2D30
+	obj.Win_line = win_line_2D30
+	obj.Status_redblackline = status_redblack_line_2D30
+	obj.Status_maintenance = maintenance_2D30
+	helpers.SetRedis(fieldconfig_redis, obj, 10080*time.Minute)
+
 	res.Status = fiber.StatusOK
 	res.Message = msg
 	res.Record = nil
