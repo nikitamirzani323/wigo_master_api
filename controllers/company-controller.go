@@ -410,6 +410,10 @@ func Companyconfhome(c *fiber.Ctx) error {
 		companyconf_2digit_30_minbet, _ := jsonparser.GetInt(value, "companyconf_2digit_30_minbet")
 		companyconf_2digit_30_maxbet, _ := jsonparser.GetInt(value, "companyconf_2digit_30_maxbet")
 		companyconf_2digit_30_win, _ := jsonparser.GetFloat(value, "companyconf_2digit_30_win")
+		companyconf_2digit_30_redblack, _ := jsonparser.GetFloat(value, "companyconf_2digit_30_redblack")
+		companyconf_2digit_30_line, _ := jsonparser.GetFloat(value, "companyconf_2digit_30_line")
+		companyconf_2digit_30_status_redblack_line, _ := jsonparser.GetString(value, "companyconf_2digit_30_status_redblack_line")
+		companyconf_2digit_30_status_redblack_line_css, _ := jsonparser.GetString(value, "companyconf_2digit_30_status_redblack_line_css")
 		companyconf_2digit_30_operator, _ := jsonparser.GetString(value, "companyconf_2digit_30_operator")
 		companyconf_2digit_30_operator_css, _ := jsonparser.GetString(value, "companyconf_2digit_30_operator_css")
 		companyconf_2digit_30_maintenance, _ := jsonparser.GetString(value, "companyconf_2digit_30_maintenance")
@@ -425,6 +429,10 @@ func Companyconfhome(c *fiber.Ctx) error {
 		obj.Companyconf_2digit_30_minbet = int(companyconf_2digit_30_minbet)
 		obj.Companyconf_2digit_30_maxbet = int(companyconf_2digit_30_maxbet)
 		obj.Companyconf_2digit_30_win = float64(companyconf_2digit_30_win)
+		obj.Companyconf_2digit_30_win_redblack = float64(companyconf_2digit_30_redblack)
+		obj.Companyconf_2digit_30_win_line = float64(companyconf_2digit_30_line)
+		obj.Companyconf_2digit_30_status_redblack_line = companyconf_2digit_30_status_redblack_line
+		obj.Companyconf_2digit_30_status_redblack_line_css = companyconf_2digit_30_status_redblack_line_css
 		obj.Companyconf_2digit_30_operator = companyconf_2digit_30_operator
 		obj.Companyconf_2digit_30_operator_css = companyconf_2digit_30_operator_css
 		obj.Companyconf_2digit_30_maintenance = companyconf_2digit_30_maintenance
@@ -750,16 +758,16 @@ func CompanyconfSave(c *fiber.Ctx) error {
 	temp_decp := helpers.Decryption(name)
 	client_admin, _ := helpers.Parsing_Decry(temp_decp, "==")
 
-	// admin, idcompany, status_2D30, maintenance_2D30 string, operator_2D30 string,
+	// admin, idcompany, status_2D30, maintenance_2D30 string, operator_2D30 string, status_redblack_line_2D30 string,
 	// time_2D30, digit_2D30, minbet_2D30, maxbet_2D30 int,
-	// win_2D30 float64
+	// win_2D30, win_redblack_2D30, win_line_2D30 float64
 	result, err := models.Save_companyconf(
 		client_admin,
 		client.Companyconf_id, client.Companyconf_2digit_30_status,
-		client.Companyconf_2digit_30_maintenance, client.Companyconf_2digit_30_operator,
+		client.Companyconf_2digit_30_maintenance, client.Companyconf_2digit_30_operator, client.Companyconf_2digit_30_status_redblack_line,
 		client.Companyconf_2digit_30_time, client.Companyconf_2digit_30_digit,
 		client.Companyconf_2digit_30_minbet, client.Companyconf_2digit_30_maxbet,
-		client.Companyconf_2digit_30_win)
+		client.Companyconf_2digit_30_win, client.Companyconf_2digit_30_win_redblack, client.Companyconf_2digit_30_win_line)
 	if err != nil {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
