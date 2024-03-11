@@ -781,7 +781,12 @@ func Save_companyconf(admin, idcompany, status_2D30, maintenance_2D30 string, op
 	}
 
 	fieldconfig_redis := "CONFIG_ALL_" + strings.ToLower(idcompany)
+	val_conf_all := helpers.DeleteRedis(fieldconfig_redis)
+	fmt.Println("")
+	fmt.Printf("Redis Delete CONFIG ALL : %d\r", val_conf_all)
+
 	type Configure struct {
+		Curr                string  `json:"curr"`
 		Minbet              int     `json:"minbet"`
 		Maxbet              int     `json:"maxbet"`
 		Win_angka           float64 `json:"win_angka"`
@@ -791,6 +796,8 @@ func Save_companyconf(admin, idcompany, status_2D30, maintenance_2D30 string, op
 		Status_maintenance  string  `json:"status_maintenance"`
 	}
 	var obj Configure
+	obj.Curr = _Get_infocompany(idcompany)
+	obj.Minbet = minbet_2D30
 	obj.Minbet = minbet_2D30
 	obj.Maxbet = maxbet_2D30
 	obj.Win_angka = win_2D30
@@ -826,4 +833,24 @@ func _Get_adminrule(idrule int) string {
 	}
 
 	return rule
+}
+func _Get_infocompany(idcompany string) string {
+	con := db.CreateCon()
+	ctx := context.Background()
+	idcurr := ""
+	sql_select := `SELECT
+			idcurr    
+			FROM ` + database_company_local + `  
+			WHERE idcompany='` + idcompany + `'       
+		`
+
+	row := con.QueryRowContext(ctx, sql_select)
+	switch e := row.Scan(&idcurr); e {
+	case sql.ErrNoRows:
+	case nil:
+	default:
+		helpers.ErrorCheck(e)
+	}
+
+	return idcurr
 }
