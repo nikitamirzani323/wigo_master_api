@@ -6,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/nikitamirzani323/WIGO_MASTER_API/configs"
-	"github.com/nikitamirzani323/WIGO_MASTER_API/db"
-	"github.com/nikitamirzani323/WIGO_MASTER_API/helpers"
+	"bitbucket.org/isbtotogroup/wigo_master_api/configs"
+	"bitbucket.org/isbtotogroup/wigo_master_api/db"
+	"bitbucket.org/isbtotogroup/wigo_master_api/helpers"
 	"github.com/nleeper/goment"
 )
 

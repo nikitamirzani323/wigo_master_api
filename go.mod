@@ -1,4 +1,4 @@
-module github.com/nikitamirzani323/WIGO_MASTER_API
+module bitbucket.org/isbtotogroup/wigo_master_api
 
 go 1.17
 

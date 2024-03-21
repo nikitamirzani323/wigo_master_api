@@ -4,13 +4,13 @@ import (
 	"log"
 	"time"
 
+	"bitbucket.org/isbtotogroup/wigo_master_api/entities"
+	"bitbucket.org/isbtotogroup/wigo_master_api/helpers"
+	"bitbucket.org/isbtotogroup/wigo_master_api/models"
 	"github.com/buger/jsonparser"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/nikitamirzani323/WIGO_MASTER_API/entities"
-	"github.com/nikitamirzani323/WIGO_MASTER_API/helpers"
-	"github.com/nikitamirzani323/WIGO_MASTER_API/models"
 )
 
 const Fieldadmin_home_redis = "LISTADMIN_BACKEND_INVENTORY"

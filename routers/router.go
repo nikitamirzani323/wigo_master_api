@@ -1,13 +1,13 @@
 package routers
 
 import (
+	"bitbucket.org/isbtotogroup/wigo_master_api/controllers"
+	"bitbucket.org/isbtotogroup/wigo_master_api/middleware"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/nikitamirzani323/WIGO_MASTER_API/controllers"
-	"github.com/nikitamirzani323/WIGO_MASTER_API/middleware"
 )
 
 func Init() *fiber.App {

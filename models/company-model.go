@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
+	"bitbucket.org/isbtotogroup/wigo_master_api/configs"
+	"bitbucket.org/isbtotogroup/wigo_master_api/db"
+	"bitbucket.org/isbtotogroup/wigo_master_api/entities"
+	"bitbucket.org/isbtotogroup/wigo_master_api/helpers"
 	"github.com/gofiber/fiber/v2"
-	"github.com/nikitamirzani323/WIGO_MASTER_API/configs"
-	"github.com/nikitamirzani323/WIGO_MASTER_API/db"
-	"github.com/nikitamirzani323/WIGO_MASTER_API/entities"
-	"github.com/nikitamirzani323/WIGO_MASTER_API/helpers"
 	"github.com/nleeper/goment"
 )
 
