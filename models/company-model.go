@@ -780,7 +780,8 @@ func Save_companyconf(admin, idcompany, status_2D30, maintenance_2D30 string, op
 		}
 	}
 
-	fieldconfig_redis := "CONFIG_ALL_" + strings.ToLower(idcompany)
+	fieldconfig_redis := strings.ToLower(idcompany) + ":12D30S:" + "CONFIG"
+
 	val_conf_all := helpers.DeleteRedis(fieldconfig_redis)
 	fmt.Println("")
 	fmt.Printf("Redis Delete CONFIG ALL : %d\r", val_conf_all)

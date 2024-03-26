@@ -15,11 +15,11 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-const Fieldcompany_home_redis = "LISTCOMPANY_BACKEND"
-const Fieldcompanyadmin_home_redis = "LISTCOMPANYADMIN_BACKEND"
-const Fieldcompanyadminrule_home_redis = "LISTCOMPANYADMINRULE_BACKEND"
-const Fieldcompanymoney_home_redis = "LISTCOMPANYMONEY_BACKEND"
-const Fieldcompanyconf_home_redis = "LISTCOMPANYCONF_BACKEND"
+const Fieldcompany_home_redis = "MASTER:BACKEND:LISTCOMPANY"
+const Fieldcompanyadmin_home_redis = "MASTER:BACKEND:LISTCOMPANYADMIN"
+const Fieldcompanyadminrule_home_redis = "MASTER:BACKEND:LISTCOMPANYADMINRULE"
+const Fieldcompanymoney_home_redis = "MASTER:BACKEND:LISTCOMPANYMONEY"
+const Fieldcompanyconf_home_redis = "MASTER:BACKEND:LISTCOMPANYCONF"
 
 func Companyhome(c *fiber.Ctx) error {
 	var errors []*helpers.ErrorResponse

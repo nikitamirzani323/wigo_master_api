@@ -13,8 +13,8 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-const Fieldcurr_home_redis = "LISTCURR_BACKEND"
-const Fieldcurr_home_client_redis = "LISTCURR_FRONTEND"
+const Fieldcurr_home_redis = "MASTER:BACKEND:LISTCURR"
+const Fieldcurr_home_client_redis = "CLIENT:LISTCURR"
 
 func Currhome(c *fiber.Ctx) error {
 	var obj entities.Model_curr

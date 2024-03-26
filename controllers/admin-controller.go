@@ -13,7 +13,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-const Fieldadmin_home_redis = "LISTADMIN_BACKEND_INVENTORY"
+const Fieldadmin_home_redis = "MASTER:BACKEND:LISTADMIN"
 
 func Adminhome(c *fiber.Ctx) error {
 	var obj entities.Responseredis_adminhome

@@ -13,7 +13,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-const Fieldadminrule_home_redis = "LISTADMINRULE_BACKEND_ISBPANEL"
+const Fieldadminrule_home_redis = "MASTER:BACKEND:LISTADMINRULE"
 
 func Adminrulehome(c *fiber.Ctx) error {
 
