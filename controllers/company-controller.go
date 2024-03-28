@@ -410,8 +410,10 @@ func Companyconfhome(c *fiber.Ctx) error {
 		companyconf_2digit_30_minbet, _ := jsonparser.GetInt(value, "companyconf_2digit_30_minbet")
 		companyconf_2digit_30_maxbet, _ := jsonparser.GetInt(value, "companyconf_2digit_30_maxbet")
 		companyconf_2digit_30_win, _ := jsonparser.GetFloat(value, "companyconf_2digit_30_win")
-		companyconf_2digit_30_redblack, _ := jsonparser.GetFloat(value, "companyconf_2digit_30_redblack")
-		companyconf_2digit_30_line, _ := jsonparser.GetFloat(value, "companyconf_2digit_30_line")
+		companyconf_2digit_30_win_redblack, _ := jsonparser.GetFloat(value, "companyconf_2digit_30_win_redblack")
+		companyconf_2digit_30_win_line, _ := jsonparser.GetFloat(value, "companyconf_2digit_30_win_line")
+		companyconf_2digit_30_win_zona, _ := jsonparser.GetFloat(value, "companyconf_2digit_30_win_zona")
+		companyconf_2digit_30_win_jackpot, _ := jsonparser.GetFloat(value, "companyconf_2digit_30_win_jackpot")
 		companyconf_2digit_30_status_redblack_line, _ := jsonparser.GetString(value, "companyconf_2digit_30_status_redblack_line")
 		companyconf_2digit_30_status_redblack_line_css, _ := jsonparser.GetString(value, "companyconf_2digit_30_status_redblack_line_css")
 		companyconf_2digit_30_operator, _ := jsonparser.GetString(value, "companyconf_2digit_30_operator")
@@ -429,8 +431,10 @@ func Companyconfhome(c *fiber.Ctx) error {
 		obj.Companyconf_2digit_30_minbet = int(companyconf_2digit_30_minbet)
 		obj.Companyconf_2digit_30_maxbet = int(companyconf_2digit_30_maxbet)
 		obj.Companyconf_2digit_30_win = float64(companyconf_2digit_30_win)
-		obj.Companyconf_2digit_30_win_redblack = float64(companyconf_2digit_30_redblack)
-		obj.Companyconf_2digit_30_win_line = float64(companyconf_2digit_30_line)
+		obj.Companyconf_2digit_30_win_redblack = float64(companyconf_2digit_30_win_redblack)
+		obj.Companyconf_2digit_30_win_line = float64(companyconf_2digit_30_win_line)
+		obj.Companyconf_2digit_30_win_zona = float64(companyconf_2digit_30_win_zona)
+		obj.Companyconf_2digit_30_win_jackpot = float64(companyconf_2digit_30_win_jackpot)
 		obj.Companyconf_2digit_30_status_redblack_line = companyconf_2digit_30_status_redblack_line
 		obj.Companyconf_2digit_30_status_redblack_line_css = companyconf_2digit_30_status_redblack_line_css
 		obj.Companyconf_2digit_30_operator = companyconf_2digit_30_operator
@@ -760,14 +764,15 @@ func CompanyconfSave(c *fiber.Ctx) error {
 
 	// admin, idcompany, status_2D30, maintenance_2D30 string, operator_2D30 string, status_redblack_line_2D30 string,
 	// time_2D30, digit_2D30, minbet_2D30, maxbet_2D30 int,
-	// win_2D30, win_redblack_2D30, win_line_2D30 float64
+	// win_2D30, win_redblack_2D30, win_line_2D30, win_zona_2D30, win_jackpot_2D30 float64
 	result, err := models.Save_companyconf(
 		client_admin,
 		client.Companyconf_id, client.Companyconf_2digit_30_status,
 		client.Companyconf_2digit_30_maintenance, client.Companyconf_2digit_30_operator, client.Companyconf_2digit_30_status_redblack_line,
 		client.Companyconf_2digit_30_time, client.Companyconf_2digit_30_digit,
 		client.Companyconf_2digit_30_minbet, client.Companyconf_2digit_30_maxbet,
-		client.Companyconf_2digit_30_win, client.Companyconf_2digit_30_win_redblack, client.Companyconf_2digit_30_win_line)
+		client.Companyconf_2digit_30_win, client.Companyconf_2digit_30_win_redblack, client.Companyconf_2digit_30_win_line,
+		client.Companyconf_2digit_30_win_zona, client.Companyconf_2digit_30_win_jackpot)
 	if err != nil {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{

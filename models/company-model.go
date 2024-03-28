@@ -376,7 +376,7 @@ func Fetch_companyconfHome(idcompany string) (helpers.Response, error) {
 	sql_select += "SELECT "
 	sql_select += "conf_2digit_30_time, conf_2digit_30_digit, "
 	sql_select += "conf_2digit_30_minbet, conf_2digit_30_maxbet,   "
-	sql_select += "conf_2digit_30_win, conf_2digit_30_win_redblack, conf_2digit_30_win_line,   "
+	sql_select += "conf_2digit_30_win, conf_2digit_30_win_redblack, conf_2digit_30_win_line,conf_2digit_30_win_zona,conf_2digit_30_win_jackpot,   "
 	sql_select += "conf_2digit_30_status_redblack_line, conf_2digit_30_operator, conf_2digit_30_maintenance, conf_2digit_30_status,  "
 	sql_select += "createconf, to_char(COALESCE(createdateconf,now()), 'YYYY-MM-DD HH24:MI:SS'), "
 	sql_select += "updateconf, to_char(COALESCE(updatedateconf,now()), 'YYYY-MM-DD HH24:MI:SS')  "
@@ -387,14 +387,14 @@ func Fetch_companyconfHome(idcompany string) (helpers.Response, error) {
 	helpers.ErrorCheck(err)
 	for row.Next() {
 		var (
-			conf_2digit_30_time_db, conf_2digit_30_digit_db, conf_2digit_30_minbet_db, conf_2digit_30_maxbet_db                         int
-			conf_2digit_30_win_db, conf_2digit_30_win_redblack_db, conf_2digit_30_win_line                                              float64
-			conf_2digit_30_status_redblack_line_db, conf_2digit_30_operator_db, conf_2digit_30_maintenance_db, conf_2digit_30_status_db string
-			createconf_db, createdateconf_db, updateconf_db, updatedateconf_db                                                          string
+			conf_2digit_30_time_db, conf_2digit_30_digit_db, conf_2digit_30_minbet_db, conf_2digit_30_maxbet_db                                       int
+			conf_2digit_30_win_db, conf_2digit_30_win_redblack_db, conf_2digit_30_win_line, conf_2digit_30_win_zona_db, conf_2digit_30_win_jackpot_db float64
+			conf_2digit_30_status_redblack_line_db, conf_2digit_30_operator_db, conf_2digit_30_maintenance_db, conf_2digit_30_status_db               string
+			createconf_db, createdateconf_db, updateconf_db, updatedateconf_db                                                                        string
 		)
 
 		err = row.Scan(&conf_2digit_30_time_db, &conf_2digit_30_digit_db, &conf_2digit_30_minbet_db,
-			&conf_2digit_30_maxbet_db, &conf_2digit_30_win_db, &conf_2digit_30_win_redblack_db, &conf_2digit_30_win_line,
+			&conf_2digit_30_maxbet_db, &conf_2digit_30_win_db, &conf_2digit_30_win_redblack_db, &conf_2digit_30_win_line, &conf_2digit_30_win_zona_db, &conf_2digit_30_win_jackpot_db,
 			&conf_2digit_30_status_redblack_line_db, &conf_2digit_30_operator_db, &conf_2digit_30_maintenance_db, &conf_2digit_30_status_db,
 			&createconf_db, &createdateconf_db, &updateconf_db, &updatedateconf_db)
 
@@ -432,6 +432,8 @@ func Fetch_companyconfHome(idcompany string) (helpers.Response, error) {
 		obj.Companyconf_2digit_30_win = conf_2digit_30_win_db
 		obj.Companyconf_2digit_30_win_redblack = conf_2digit_30_win_redblack_db
 		obj.Companyconf_2digit_30_win_line = conf_2digit_30_win_line
+		obj.Companyconf_2digit_30_win_zona = conf_2digit_30_win_zona_db
+		obj.Companyconf_2digit_30_win_jackpot = conf_2digit_30_win_jackpot_db
 		obj.Companyconf_2digit_30_status_redblack_line = conf_2digit_30_status_redblack_line_db
 		obj.Companyconf_2digit_30_status_redblack_line_css = redblackline_css
 		obj.Companyconf_2digit_30_operator = conf_2digit_30_operator_db
@@ -716,7 +718,7 @@ func Delete_companymoney(idcompany string, idrecord int) (helpers.Response, erro
 }
 func Save_companyconf(admin, idcompany, status_2D30, maintenance_2D30 string, operator_2D30 string, status_redblack_line_2D30 string,
 	time_2D30, digit_2D30, minbet_2D30, maxbet_2D30 int,
-	win_2D30, win_redblack_2D30, win_line_2D30 float64) (helpers.Response, error) {
+	win_2D30, win_redblack_2D30, win_line_2D30, win_zona_2D30, win_jackpot_2D30 float64) (helpers.Response, error) {
 	var res helpers.Response
 	msg := "Failed"
 	tglnow, _ := goment.New()
@@ -730,22 +732,22 @@ func Save_companyconf(admin, idcompany, status_2D30, maintenance_2D30 string, op
 				` + database_companyconfig_local + ` (
 					idcompany, conf_2digit_30_time,  conf_2digit_30_digit, 
 					conf_2digit_30_minbet, conf_2digit_30_maxbet, 
-					conf_2digit_30_win, conf_2digit_30_win_redblack, conf_2digit_30_win_line,
+					conf_2digit_30_win, conf_2digit_30_win_redblack, conf_2digit_30_win_line, conf_2digit_30_win_zona, conf_2digit_30_win_jackpot
 					conf_2digit_30_status_redblack_line, conf_2digit_30_operator, conf_2digit_30_maintenance, conf_2digit_30_status, 
 					createconf, createdateconf 
 				) values (
 					$1, $2, $3, 
 					$4, $5, 
-					$6, $7, $8,
-					$9, $10, $11, $12,
-					$13, $14    
+					$6, $7, $8, $9, $10,
+					$11, $12, $13, $14,
+					$15, $16     
 				)
 			`
 
 		flag_insert, msg_insert := Exec_SQL(sql_insert, database_companyconfig_local, "INSERT",
 			idcompany, time_2D30, digit_2D30,
 			minbet_2D30, maxbet_2D30,
-			win_2D30, win_redblack_2D30, win_line_2D30,
+			win_2D30, win_redblack_2D30, win_line_2D30, win_zona_2D30, win_jackpot_2D30,
 			status_redblack_line_2D30, operator_2D30, maintenance_2D30, status_2D30,
 			admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
 
@@ -760,16 +762,16 @@ func Save_companyconf(admin, idcompany, status_2D30, maintenance_2D30 string, op
 				` + database_companyconfig_local + `  
 				SET conf_2digit_30_time=$1, conf_2digit_30_digit=$2, 
 				conf_2digit_30_minbet=$3, conf_2digit_30_maxbet=$4, 
-				conf_2digit_30_win=$5, conf_2digit_30_win_redblack=$6, conf_2digit_30_win_line=$7, 
-				conf_2digit_30_status_redblack_line=$8 ,conf_2digit_30_operator=$9, conf_2digit_30_maintenance=$10, conf_2digit_30_status=$11,   
-				updateconf=$12, updatedateconf=$13       
-				WHERE idcompany=$14     
+				conf_2digit_30_win=$5, conf_2digit_30_win_redblack=$6, conf_2digit_30_win_line=$7, conf_2digit_30_win_zona=$8, conf_2digit_30_win_jackpot=$9, 
+				conf_2digit_30_status_redblack_line=$10 ,conf_2digit_30_operator=$11, conf_2digit_30_maintenance=$12, conf_2digit_30_status=$13,   
+				updateconf=$14, updatedateconf=$15       
+				WHERE idcompany=$16      
 			`
 
 		flag_update, msg_update := Exec_SQL(sql_update, database_companyconfig_local, "UPDATE",
 			time_2D30, digit_2D30,
 			minbet_2D30, maxbet_2D30,
-			win_2D30, win_redblack_2D30, win_line_2D30,
+			win_2D30, win_redblack_2D30, win_line_2D30, win_zona_2D30, win_jackpot_2D30,
 			status_redblack_line_2D30, operator_2D30, maintenance_2D30, status_2D30,
 			admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"), idcompany)
 
@@ -793,6 +795,8 @@ func Save_companyconf(admin, idcompany, status_2D30, maintenance_2D30 string, op
 		Win_angka           float64 `json:"win_angka"`
 		Win_redblack        float64 `json:"win_redblack"`
 		Win_line            float64 `json:"win_line"`
+		Win_zona            float64 `json:"win_zona"`
+		Win_jackpot         float64 `json:"win_jackpot"`
 		Status_redblackline string  `json:"status_redblackline"`
 		Status_maintenance  string  `json:"status_maintenance"`
 	}
@@ -804,6 +808,8 @@ func Save_companyconf(admin, idcompany, status_2D30, maintenance_2D30 string, op
 	obj.Win_angka = win_2D30
 	obj.Win_redblack = win_redblack_2D30
 	obj.Win_line = win_line_2D30
+	obj.Win_zona = win_zona_2D30
+	obj.Win_jackpot = win_jackpot_2D30
 	obj.Status_redblackline = status_redblack_line_2D30
 	obj.Status_maintenance = maintenance_2D30
 	helpers.SetRedis(fieldconfig_redis, obj, 10080*time.Minute)
