@@ -59,7 +59,7 @@ func Adminhome(c *fiber.Ctx) error {
 				"record":  nil,
 			})
 		}
-		helpers.SetRedis(Fieldadmin_home_redis, result, 60*time.Minute)
+		helpers.SetRedis(Fieldadmin_home_redis, result, 24*time.Hour)
 		log.Println("ADMIN MYSQL")
 		return c.JSON(result)
 	} else {

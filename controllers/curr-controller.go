@@ -46,7 +46,7 @@ func Currhome(c *fiber.Ctx) error {
 				"record":  nil,
 			})
 		}
-		helpers.SetRedis(Fieldcurr_home_redis, result, 60*time.Minute)
+		helpers.SetRedis(Fieldcurr_home_redis, result, 24*time.Hour)
 		fmt.Println("CURR MYSQL")
 		return c.JSON(result)
 	} else {

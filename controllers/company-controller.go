@@ -116,7 +116,7 @@ func Companyhome(c *fiber.Ctx) error {
 				"record":  nil,
 			})
 		}
-		helpers.SetRedis(Fieldcompany_home_redis+"_"+strconv.Itoa(client.Company_page)+"_"+client.Company_search, result, 60*time.Minute)
+		helpers.SetRedis(Fieldcompany_home_redis+"_"+strconv.Itoa(client.Company_page)+"_"+client.Company_search, result, 24*time.Hour)
 		fmt.Println("COMPANY DATABASE")
 		return c.JSON(result)
 	} else {
@@ -210,7 +210,7 @@ func Companyadminhome(c *fiber.Ctx) error {
 				"record":  nil,
 			})
 		}
-		helpers.SetRedis(Fieldcompanyadmin_home_redis+"_"+strings.ToLower(client.Companyadmin_idcompany), result, 60*time.Minute)
+		helpers.SetRedis(Fieldcompanyadmin_home_redis+"_"+strings.ToLower(client.Companyadmin_idcompany), result, 24*time.Hour)
 		fmt.Println("COMPANY ADMIN DATABASE")
 		return c.JSON(result)
 	} else {
@@ -284,7 +284,7 @@ func Companyadminrulehome(c *fiber.Ctx) error {
 				"record":  nil,
 			})
 		}
-		helpers.SetRedis(Fieldcompanyadminrule_home_redis+"_"+strings.ToLower(client.Companyadmin_idcompany), result, 60*time.Minute)
+		helpers.SetRedis(Fieldcompanyadminrule_home_redis+"_"+strings.ToLower(client.Companyadmin_idcompany), result, 24*time.Hour)
 		fmt.Println("COMPANY ADMIN RULE DATABASE")
 		return c.JSON(result)
 	} else {
@@ -355,7 +355,7 @@ func Companymoneyhome(c *fiber.Ctx) error {
 				"record":  nil,
 			})
 		}
-		helpers.SetRedis(Fieldcompanymoney_home_redis+"_"+strings.ToLower(client.Companyadmin_idcompany), result, 60*time.Minute)
+		helpers.SetRedis(Fieldcompanymoney_home_redis+"_"+strings.ToLower(client.Companyadmin_idcompany), result, 24*time.Hour)
 		fmt.Println("COMPANY MONEY DATABASE")
 		return c.JSON(result)
 	} else {
@@ -458,7 +458,7 @@ func Companyconfhome(c *fiber.Ctx) error {
 				"record":  nil,
 			})
 		}
-		helpers.SetRedis(Fieldcompanyconf_home_redis+"_"+strings.ToLower(client.Companyadmin_idcompany), result, 60*time.Minute)
+		helpers.SetRedis(Fieldcompanyconf_home_redis+"_"+strings.ToLower(client.Companyadmin_idcompany), result, 24*time.Hour)
 		fmt.Println("COMPANY CONF DATABASE")
 		return c.JSON(result)
 	} else {

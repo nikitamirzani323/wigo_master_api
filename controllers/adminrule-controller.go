@@ -42,7 +42,7 @@ func Adminrulehome(c *fiber.Ctx) error {
 				"record":  nil,
 			})
 		}
-		helpers.SetRedis(Fieldadminrule_home_redis, result, 60*time.Minute)
+		helpers.SetRedis(Fieldadminrule_home_redis, result, 24*time.Hour)
 		fmt.Println("ADMIN RULE MYSQL")
 		return c.JSON(result)
 	} else {
