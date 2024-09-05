@@ -26,7 +26,6 @@ func Login_Model(username, password, ipaddress string) (bool, string, error) {
 			AND statuslogin = 'Y' 
 		`
 
-	fmt.Println(sql_select, username)
 	row := con.QueryRowContext(ctx, sql_select, username)
 	switch e := row.Scan(&passwordDB, &idadminDB); e {
 	case sql.ErrNoRows:
@@ -36,9 +35,7 @@ func Login_Model(username, password, ipaddress string) (bool, string, error) {
 	default:
 		return false, "", errors.New("Username and Password Not Found")
 	}
-
 	hashpass := helpers.HashPasswordMD5(password)
-
 	if hashpass != passwordDB {
 		return false, "", nil
 	}
@@ -52,11 +49,8 @@ func Login_Model(username, password, ipaddress string) (bool, string, error) {
 			AND statuslogin = 'Y' 
 		`
 		flag_update, msg_update := Exec_SQL(sql_update, configs.DB_tbl_admin, "UPDATE",
-			tglnow.Format("YYYY-MM-DD HH:mm:ss"),
-			ipaddress,
-			username,
-			tglnow.Format("YYYY-MM-DD HH:mm:ss"),
-			username)
+			tglnow.Format("YYYY-MM-DD HH:mm:ss"), ipaddress, username,
+			tglnow.Format("YYYY-MM-DD HH:mm:ss"), username)
 
 		if flag_update {
 			flag = true

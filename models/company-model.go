@@ -326,6 +326,7 @@ func Fetch_companymoneyHome(idcompany string) (helpers.Response, error) {
 	sql_select += "updatecompmoney, to_char(COALESCE(updatedatecompmoney,now()), 'YYYY-MM-DD HH24:MI:SS')  "
 	sql_select += "FROM " + database_companymoney_local + " "
 	sql_select += "WHERE idcompany ='" + idcompany + "' "
+	sql_select += "ORDER BY compmoney ASC "
 	fmt.Println(sql_select)
 	row, err := con.QueryContext(ctx, sql_select)
 	helpers.ErrorCheck(err)
