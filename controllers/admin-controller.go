@@ -13,7 +13,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-const Fieldadmin_home_redis = "MASTER:BACKEND:LISTADMIN"
+const Fieldadmin_home_redis = "MASTER:API:LISTADMIN"
 
 func Adminhome(c *fiber.Ctx) error {
 	var obj entities.Responseredis_adminhome
@@ -164,6 +164,6 @@ func AdminSave(c *fiber.Ctx) error {
 }
 func _deleteredis_admin() {
 	val_master := helpers.DeleteRedis(Fieldadmin_home_redis)
-	log.Printf("Redis Delete BACKEND ADMIN : %d", val_master)
+	log.Printf("Redis Delete MASTER ADMIN : %d\n", val_master)
 
 }

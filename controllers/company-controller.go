@@ -15,11 +15,11 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-const Fieldcompany_home_redis = "MASTER:BACKEND:LISTCOMPANY"
-const Fieldcompanyadmin_home_redis = "MASTER:BACKEND:LISTCOMPANYADMIN"
-const Fieldcompanyadminrule_home_redis = "MASTER:BACKEND:LISTCOMPANYADMINRULE"
-const Fieldcompanymoney_home_redis = "MASTER:BACKEND:LISTCOMPANYMONEY"
-const Fieldcompanyconf_home_redis = "MASTER:BACKEND:LISTCOMPANYCONF"
+const Fieldcompany_home_redis = "MASTER:API:LISTCOMPANY"
+const Fieldcompanyadmin_home_redis = "MASTER:API:LISTCOMPANYADMIN"
+const Fieldcompanyadminrule_home_redis = "MASTER:API:LISTCOMPANYADMINRULE"
+const Fieldcompanymoney_home_redis = "MASTER:API:LISTCOMPANYMONEY"
+const Fieldcompanyconf_home_redis = "MASTER:API:LISTCOMPANYCONF"
 
 func Companyhome(c *fiber.Ctx) error {
 	var errors []*helpers.ErrorResponse
@@ -787,18 +787,18 @@ func CompanyconfSave(c *fiber.Ctx) error {
 }
 func _deleteredis_company(idcompany string) {
 	val_master := helpers.DeleteRedis(Fieldcompany_home_redis)
-	fmt.Printf("Redis Delete BACKEND COMPANY : %d", val_master)
+	fmt.Printf("Redis Delete MASTER COMPANY : %d\n", val_master)
 
 	val_compconf := helpers.DeleteRedis(Fieldcompanyconf_home_redis + "_" + strings.ToLower(idcompany))
-	fmt.Printf("Redis Delete BACKEND COMPANY CONF : %d", val_compconf)
+	fmt.Printf("Redis Delete MASTER COMPANY CONF : %d\n", val_compconf)
 	val_compadmin := helpers.DeleteRedis(Fieldcompanyadmin_home_redis + "_" + strings.ToLower(idcompany))
-	fmt.Printf("Redis Delete BACKEND COMPANY ADMIN : %d", val_compadmin)
+	fmt.Printf("Redis Delete MASTER COMPANY ADMIN : %d\n", val_compadmin)
 	val_compadminrule := helpers.DeleteRedis(Fieldcompanyadminrule_home_redis + "_" + strings.ToLower(idcompany))
-	fmt.Printf("Redis Delete BACKEND COMPANY ADMINRULE : %d", val_compadminrule)
+	fmt.Printf("Redis Delete MASTER COMPANY ADMINRULE : %d\n", val_compadminrule)
 	val_compmoney := helpers.DeleteRedis(Fieldcompanymoney_home_redis + "_" + strings.ToLower(idcompany))
-	fmt.Printf("Redis Delete BACKEND COMPANY MONEY : %d", val_compmoney)
+	fmt.Printf("Redis Delete MASTER COMPANY MONEY : %d\n", val_compmoney)
 
 	//==DELETE REDIS TIMER
 	val_timer := helpers.DeleteRedis("CONFIG" + "_" + strings.ToLower(idcompany))
-	fmt.Printf("Redis Delete BACKEND TIMER CONFIG : %d", val_timer)
+	fmt.Printf("Redis Delete SERVICE TIMER CONFIG : %d\n", val_timer)
 }

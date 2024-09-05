@@ -13,7 +13,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-const Fieldadminrule_home_redis = "MASTER:BACKEND:LISTADMINRULE"
+const Fieldadminrule_home_redis = "MASTER:API:LISTADMINRULE"
 
 func Adminrulehome(c *fiber.Ctx) error {
 
@@ -106,6 +106,6 @@ func AdminruleSave(c *fiber.Ctx) error {
 
 func _deleteredis_adminrule() {
 	val_master := helpers.DeleteRedis(Fieldadminrule_home_redis)
-	fmt.Printf("Redis Delete BACKEND ADMIN RULE : %d", val_master)
+	fmt.Printf("Redis Delete MASTER ADMIN RULE : %d\n", val_master)
 
 }

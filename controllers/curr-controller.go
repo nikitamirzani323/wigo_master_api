@@ -13,7 +13,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-const Fieldcurr_home_redis = "MASTER:BACKEND:LISTCURR"
+const Fieldcurr_home_redis = "MASTER:API:LISTCURR"
 const Fieldcurr_home_client_redis = "CLIENT:LISTCURR"
 
 func Currhome(c *fiber.Ctx) error {
@@ -111,9 +111,9 @@ func CurrSave(c *fiber.Ctx) error {
 }
 func _deleteredis_curr() {
 	val_master := helpers.DeleteRedis(Fieldcurr_home_redis)
-	fmt.Printf("Redis Delete BACKEND CURR : %d", val_master)
+	fmt.Printf("Redis Delete MASTER CURR : %d\n", val_master)
 
 	val_client := helpers.DeleteRedis(Fieldcurr_home_client_redis)
-	fmt.Printf("Redis Delete CLIENT CURR : %d", val_client)
+	fmt.Printf("Redis Delete CLIENT CURR : %d\n", val_client)
 
 }
