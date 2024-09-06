@@ -799,6 +799,8 @@ func _deleteredis_company(idcompany string) {
 	fmt.Printf("Redis Delete MASTER COMPANY MONEY : %d\n", val_compmoney)
 
 	//==DELETE REDIS TIMER
-	val_timer := helpers.DeleteRedis("CONFIG" + "_" + strings.ToLower(idcompany))
-	fmt.Printf("Redis Delete SERVICE TIMER CONFIG : %d\n", val_timer)
+	// val_timer := helpers.DeleteRedis("CONFIG" + "_" + strings.ToLower(idcompany))
+	// fmt.Printf("Redis Delete SERVICE TIMER CONFIG : %d\n", val_timer)
+	val_timer_config := helpers.DeleteRedis(strings.ToLower(idcompany) + ":12D30S:CONFIG_TIMER")
+	fmt.Printf("Redis Delete SERVICE TIMER CONFIG : %d\n", val_timer_config)
 }
