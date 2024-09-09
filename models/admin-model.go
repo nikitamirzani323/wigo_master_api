@@ -174,20 +174,21 @@ func Save_adminHome(admin, username, password, nama, rule, status, sData string)
 			sql_insert := `
 				insert into
 				` + database_admin_local + ` (
-					username , password, idadmin, name, statuslogin, joindate, 
+					username , password, idadmin, 
+					name, statuslogin, joindate, lastlogin, 
 					createadmin, createdateadmin
 				) values (
-					$1, $2, $3, $4, $5, $6, 
-					$7, $8
+					$1, $2, $3, 
+					$4, $5, $6, $7, 
+					$8, $9 
 				)
 			`
 			hashpass := helpers.HashPasswordMD5(password)
+			startjoin := tglnow.Format("YYYY-MM-DD HH:mm:ss")
 			flag_insert, msg_insert := Exec_SQL(sql_insert, database_admin_local, "INSERT",
-				username, hashpass,
-				rule, nama, status,
-				tglnow.Format("YYYY-MM-DD"),
-				admin,
-				tglnow.Format("YYYY-MM-DD HH:mm:ss"))
+				username, hashpass, rule,
+				nama, status, tglnow.Format("YYYY-MM-DD"), startjoin,
+				admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
 
 			if flag_insert {
 				msg = "Succes"
